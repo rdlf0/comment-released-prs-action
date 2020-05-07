@@ -1,0 +1,12 @@
+name: "Comment the Released PRs"
+description: "Walks through all PRs in a release and adds a comment about the release"
+inputs:
+  release-id:
+    description: "ID of the release"
+    required: true
+outputs:
+  pr-ids:
+    description: "IDs of the PRs that were commented"
+runs:
+  using: "node12"
+  main: "dist/index.js"
