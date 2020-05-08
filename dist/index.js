@@ -24909,11 +24909,12 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const token = process.env.GITHUB_TOKEN;
-            if (token === undefined) {
-                _actions_core__WEBPACK_IMPORTED_MODULE_0__.error("Missing GitHub token");
-                return;
-            }
+            // const token = process.env.GITHUB_TOKEN;
+            // if (token === undefined) {
+            //     core.error("Missing GitHub token");
+            //     return;
+            // }
+            // 
             // const octokit = new github.GitHub(token);
             // const release = await octokit.repos.getRelease();
             // const {
@@ -24923,6 +24924,8 @@ function run() {
             // } = release;
             const release = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload;
             console.log(`Release ID=${release.id}, tag=${release.tag_name}`);
+            console.log("Here's the whole payload:");
+            console.log(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload);
             // core.setOutput("pr-ids", "Some IDs will come here")
         }
         catch (error) {

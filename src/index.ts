@@ -4,12 +4,12 @@ import * as webhooks from "@octokit/webhooks"
 
 async function run(): Promise<void> {
     try {
-        const token = process.env.GITHUB_TOKEN;
-        if (token === undefined) {
-            core.error("Missing GitHub token");
-            return;
-        }
-
+        // const token = process.env.GITHUB_TOKEN;
+        // if (token === undefined) {
+        //     core.error("Missing GitHub token");
+        //     return;
+        // }
+        // 
         // const octokit = new github.GitHub(token);
         // const release = await octokit.repos.getRelease();
         // const {
@@ -21,6 +21,8 @@ async function run(): Promise<void> {
         const release = github.context.payload as webhooks.WebhookPayloadReleaseRelease;
 
         console.log(`Release ID=${release.id}, tag=${release.tag_name}`);
+        console.log("Here's the whole payload:");
+        console.log(github.context.payload);
 
         // core.setOutput("pr-ids", "Some IDs will come here")
     } catch (error) {
