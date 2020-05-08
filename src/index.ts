@@ -21,6 +21,10 @@ async function run(): Promise<void> {
         const release: Release = context.payload as Release;
 
         console.log(`Release ID=${release.id}, tag=${release.tag_name}`);
+        console.log(release.id);
+        console.log(release.author.login);
+        console.log(release.tag_name);
+        console.log(release.assets_url);
         console.log("Here's the whole payload:");
         console.log(release);
 
