@@ -1,16 +1,23 @@
 {
-  "name": "comment-released-prs-action",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@actions/core": "^1.2.4",
-    "@actions/github": "^2.2.0"
-  }
+    "name": "comment-released-prs-action",
+    "version": "1.0.0",
+    "description": "A GitHub action that adds release comments to PRs",
+    "author": "Radoslav Stoyanov <r.stoyanov@outlook.com>",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:rdlf0/comment-released-prs-action.git"
+    },
+    "keywords": [
+        "actions",
+        "release",
+        "comment",
+        "node",
+        "typescript"
+    ],
+    "license": "ISC",
+    "main": "index.js",
+    "dependencies": {
+        "@actions/core": "^1.2.4",
+        "@actions/github": "^2.2.0"
+    }
 }

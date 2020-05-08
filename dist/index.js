@@ -24909,7 +24909,12 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const github = new _actions_github__WEBPACK_IMPORTED_MODULE_1__.GitHub(process.env.GITHUB_TOKEN);
+            const token = process.env.GITHUB_TOKEN;
+            if (token === undefined) {
+                _actions_core__WEBPACK_IMPORTED_MODULE_0__.error("Missing GitHub token");
+                return;
+            }
+            const github = new _actions_github__WEBPACK_IMPORTED_MODULE_1__.GitHub(token);
             const release = yield github.repos.getReleaseByTag({
                 owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
                 repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,

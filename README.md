@@ -2,12 +2,6 @@
 
 This action iterates through all PRs that are part of a release and adds a comment to each of them containing information about the release.
 
-## Inputs
-
-### `release-id`
-
-**Required** The ID of the release.
-
 ## Outputs
 
 ### `pr-ids`
