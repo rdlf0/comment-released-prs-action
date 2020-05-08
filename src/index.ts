@@ -1,27 +1,28 @@
 import * as core from "@actions/core"
-import { GitHub, context } from "@actions/github"
 
 async function run(): Promise<void> {
     try {
-        const token = process.env.GITHUB_TOKEN;
-        if (token === undefined) {
-            core.error("Missing GitHub token");
-            return;
-        }
+        console.log("AHOY!");
 
-        const github = new GitHub(token);
+        // const token = process.env.GITHUB_TOKEN;
+        // if (token === undefined) {
+        //     core.error("Missing GitHub token");
+        //     return;
+        // }
 
-        const release = await github.repos.getReleaseByTag({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            tag: "latest"
-        });
+        // const github = new GitHub(token);
 
-        const {
-            data: { id: releaseId, tag_name: releaseTag }
-        } = release;
+        // const release = await github.repos.getReleaseByTag({
+        //     owner: context.repo.owner,
+        //     repo: context.repo.repo,
+        //     tag: "latest"
+        // });
 
-        console.log(`Release ID=${releaseId}, tag=${releaseTag}`);
+        // const {
+        //     data: { id: releaseId, tag_name: releaseTag }
+        // } = release;
+
+        // console.log(`Release ID=${releaseId}, tag=${releaseTag}`);
 
         // core.setOutput("pr-ids", "Some IDs will come here")
     } catch (error) {
