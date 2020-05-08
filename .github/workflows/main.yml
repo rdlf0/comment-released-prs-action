@@ -1,0 +1,14 @@
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    name: A testing job
+    steps:
+      - name: Comment PRs
+        uses: rdlf0/comment-released-prs-action:latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
