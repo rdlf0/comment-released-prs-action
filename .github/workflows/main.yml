@@ -11,6 +11,6 @@ jobs:
     name: A testing job
     steps:
       - name: Comment PRs
-        uses: rdlf0/comment-released-prs-action@v1
+        uses: rdlf0/comment-released-prs-action@v1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
