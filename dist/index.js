@@ -24916,8 +24916,8 @@ function run() {
                 tag: "latest"
             });
             const { data: { id: releaseId, tag_name: releaseTag } } = release;
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Release ID=${releaseId}, tag=${releaseTag}`);
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("pr-ids", "Some IDs will come here");
+            console.log(`Release ID=${releaseId}, tag=${releaseTag}`);
+            // core.setOutput("pr-ids", "Some IDs will come here")
         }
         catch (error) {
             _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);

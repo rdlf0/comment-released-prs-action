@@ -14,9 +14,9 @@ async function run(): Promise<void> {
             data: { id: releaseId, tag_name: releaseTag }
         } = release;
 
-        core.debug(`Release ID=${releaseId}, tag=${releaseTag}`);
+        console.log(`Release ID=${releaseId}, tag=${releaseTag}`);
 
-        core.setOutput("pr-ids", "Some IDs will come here")
+        // core.setOutput("pr-ids", "Some IDs will come here")
     } catch (error) {
         core.setFailed(error.message)
     }
