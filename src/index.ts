@@ -22,7 +22,7 @@ async function run(): Promise<void> {
 
         console.log(`Release ID=${release.id}, tag=${release.tag_name}`);
         console.log("Here's the whole payload:");
-        console.log(github.context.payload);
+        console.log(release);
 
         // core.setOutput("pr-ids", "Some IDs will come here")
     } catch (error) {
