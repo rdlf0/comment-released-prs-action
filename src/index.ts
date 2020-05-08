@@ -3,7 +3,14 @@ import { GitHub, context } from "@actions/github"
 
 async function run(): Promise<void> {
     try {
-        const github = new GitHub(process.env.GITHUB_TOKEN);
+        const token = process.env.GITHUB_TOKEN;
+        if (token === undefined) {
+            core.error("Missing GitHub token");
+            return;
+        }
+
+        const github = new GitHub(token);
+
         const release = await github.repos.getReleaseByTag({
             owner: context.repo.owner,
             repo: context.repo.repo,
