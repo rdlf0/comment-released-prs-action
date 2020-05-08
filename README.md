@@ -16,8 +16,8 @@ List of the IDs of the commented PRs
 
 ## Example usage
 
-```
+```yml
 uses: rdlf0/comment-released-prs-action@v1
-with:
-  release-id: ${{ github.event.release.id }}
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```

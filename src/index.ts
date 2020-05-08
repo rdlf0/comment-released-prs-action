@@ -1,10 +1,20 @@
 import * as core from "@actions/core"
+import { GitHub, context } from "@actions/github"
 
 async function run(): Promise<void> {
     try {
-        const releaseId: string = core.getInput("release-id")
-        core.debug(`Got release id: ${releaseId}`)
-        core.debug(new Date().toTimeString())
+        const github = new GitHub(process.env.GITHUB_TOKEN);
+        const release = await github.repos.getReleaseByTag({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            tag: "latest"
+        });
+
+        const {
+            data: { id: releaseId, tag_name: releaseTag }
+        } = release;
+
+        core.debug(`Release ID=${releaseId}, tag=${releaseTag}`);
 
         core.setOutput("pr-ids", "Some IDs will come here")
     } catch (error) {
