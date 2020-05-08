@@ -24929,7 +24929,7 @@ function run() {
             // core.setOutput("pr-ids", "Some IDs will come here")
         }
         catch (error) {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
+            Object(_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(error.message);
         }
     });
 }

@@ -1,6 +1,6 @@
-import * as core from "@actions/core"
-import * as github from "@actions/github"
-import * as webhooks from "@octokit/webhooks"
+import { setFailed } from "@actions/core"
+import { context } from "@actions/github"
+import { WebhookPayloadReleaseRelease as Release } from "@octokit/webhooks"
 
 async function run(): Promise<void> {
     try {
@@ -18,7 +18,7 @@ async function run(): Promise<void> {
         //     }
         // } = release;
 
-        const release = github.context.payload as webhooks.WebhookPayloadReleaseRelease;
+        const release: Release = context.payload as Release;
 
         console.log(`Release ID=${release.id}, tag=${release.tag_name}`);
         console.log("Here's the whole payload:");
@@ -26,7 +26,7 @@ async function run(): Promise<void> {
 
         // core.setOutput("pr-ids", "Some IDs will come here")
     } catch (error) {
-        core.setFailed(error.message)
+        setFailed(error.message)
     }
 }
 
