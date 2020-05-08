@@ -1,28 +1,26 @@
 import * as core from "@actions/core"
+import * as github from "@actions/github"
+import * as webhooks from "@octokit/webhooks"
 
 async function run(): Promise<void> {
     try {
-        console.log("AHOY!");
+        const token = process.env.GITHUB_TOKEN;
+        if (token === undefined) {
+            core.error("Missing GitHub token");
+            return;
+        }
 
-        // const token = process.env.GITHUB_TOKEN;
-        // if (token === undefined) {
-        //     core.error("Missing GitHub token");
-        //     return;
-        // }
-
-        // const github = new GitHub(token);
-
-        // const release = await github.repos.getReleaseByTag({
-        //     owner: context.repo.owner,
-        //     repo: context.repo.repo,
-        //     tag: "latest"
-        // });
-
+        // const octokit = new github.GitHub(token);
+        // const release = await octokit.repos.getRelease();
         // const {
-        //     data: { id: releaseId, tag_name: releaseTag }
+        //     data: {
+        //         id: releaseId, tag_name: releaseTag
+        //     }
         // } = release;
 
-        // console.log(`Release ID=${releaseId}, tag=${releaseTag}`);
+        const release = github.context.payload as webhooks.WebhookPayloadReleaseRelease;
+
+        console.log(`Release ID=${release.id}, tag=${release.tag_name}`);
 
         // core.setOutput("pr-ids", "Some IDs will come here")
     } catch (error) {
