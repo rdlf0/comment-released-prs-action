@@ -36,8 +36,6 @@ module.exports =
 /******/ 		// Load entry module and return exports
 /******/ 		return __webpack_require__(939);
 /******/ 	};
-/******/ 	// initialize runtime
-/******/ 	runtime(__webpack_require__);
 /******/
 /******/ 	// run startup
 /******/ 	return startup();
@@ -24888,15 +24886,11 @@ module.exports = uniq;
 /***/ }),
 
 /***/ 939:
-/***/ (function(__unusedmodule, __webpack_exports__, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(369);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(765);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
@@ -24904,8 +24898,9 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-
-
+Object.defineProperty(exports, "__esModule", { value: true });
+const core_1 = __webpack_require__(369);
+const github_1 = __webpack_require__(765);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -24922,18 +24917,19 @@ function run() {
             //         id: releaseId, tag_name: releaseTag
             //     }
             // } = release;
-            const release = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload;
-            Object(_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Release ID=${release.id}, tag=${release.tag_name}`);
-            Object(_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(release.id.toString());
-            Object(_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(release.author.login);
-            Object(_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(release.tag_name);
-            Object(_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(release.assets_url);
-            Object(_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)("Here's the whole payload:");
+            console.log("HELLLO!");
+            const release = github_1.context.payload;
+            console.log(`Release ID=${release.id}, tag=${release.tag_name}`);
+            console.log(release.id.toString());
+            console.log(release.author.login);
+            console.log(release.tag_name);
+            console.log(release.assets_url);
+            console.log("Here's the whole payload:");
             console.log(release);
             // core.setOutput("pr-ids", "Some IDs will come here")
         }
         catch (error) {
-            Object(_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(error.message);
+            core_1.setFailed(error.message);
         }
     });
 }
@@ -25432,43 +25428,4 @@ exports.paginateRest = paginateRest;
 
 /***/ })
 
-/******/ },
-/******/ function(__webpack_require__) { // webpackRuntimeModules
-/******/ 	"use strict";
-/******/ 
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	!function() {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = function(exports) {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	}();
-/******/ 	
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	!function() {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = function(module) {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				function getDefault() { return module['default']; } :
-/******/ 				function getModuleExports() { return module; };
-/******/ 			__webpack_require__.d(getter, 'a', getter);
-/******/ 			return getter;
-/******/ 		};
-/******/ 	}();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getter */
-/******/ 	!function() {
-/******/ 		// define getter function for harmony exports
-/******/ 		var hasOwnProperty = Object.prototype.hasOwnProperty;
-/******/ 		__webpack_require__.d = function(exports, name, getter) {
-/******/ 			if(!hasOwnProperty.call(exports, name)) {
-/******/ 				Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 			}
-/******/ 		};
-/******/ 	}();
-/******/ 	
-/******/ }
-);
+/******/ });
