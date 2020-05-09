@@ -19,6 +19,7 @@ async function run(): Promise<void> {
         // } = release;
 
         console.log("HELLLO!");
+        console.log(context.payload);
 
         const release: Release = context.payload as Release;
 

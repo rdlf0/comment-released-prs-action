@@ -24918,6 +24918,7 @@ function run() {
             //     }
             // } = release;
             console.log("HELLLO!");
+            console.log(github_1.context.payload);
             const release = github_1.context.payload;
             console.log(`Release ID=${release.id}, tag=${release.tag_name}`);
             console.log(release.id.toString());
