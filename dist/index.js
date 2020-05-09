@@ -24894,15 +24894,15 @@ function run() {
             // } = release;
             console.log("HELLLO!");
             console.log(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload);
-            // const release: Release = context.payload as Release;
-            const release = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload;
-            console.log(`Release ID=${release.release.id}, tag=${release.release.tag_name}`);
-            // console.log(release.id.toString());
-            // console.log(release.author.login);
-            // console.log(release.tag_name);
-            // console.log(release.assets_url);
-            // console.log("Here's the whole payload:");
-            // console.log(release);
+            const payload = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload;
+            const release = payload.release;
+            console.log(`Release ID=${release.id}, tag=${release.tag_name}`);
+            console.log(release.id);
+            console.log(release.author.login);
+            console.log(release.tag_name);
+            console.log(release.assets_url);
+            console.log("Here's the whole payload:");
+            console.log(release);
             // core.setOutput("pr-ids", "Some IDs will come here")
         }
         catch (error) {

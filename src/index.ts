@@ -22,16 +22,16 @@ async function run(): Promise<void> {
         console.log("HELLLO!");
         console.log(context.payload);
 
-        // const release: Release = context.payload as Release;
-        const release: webhooks.WebhookPayloadRelease = context.payload as webhooks.WebhookPayloadRelease;
+        const payload: webhooks.WebhookPayloadRelease = context.payload as webhooks.WebhookPayloadRelease;
+        const release = payload.release;
 
-        console.log(`Release ID=${release.release.id}, tag=${release.release.tag_name}`);
-        // console.log(release.id.toString());
-        // console.log(release.author.login);
-        // console.log(release.tag_name);
-        // console.log(release.assets_url);
-        // console.log("Here's the whole payload:");
-        // console.log(release);
+        console.log(`Release ID=${release.id}, tag=${release.tag_name}`);
+        console.log(release.id);
+        console.log(release.author.login);
+        console.log(release.tag_name);
+        console.log(release.assets_url);
+        console.log("Here's the whole payload:");
+        console.log(release);
 
         // core.setOutput("pr-ids", "Some IDs will come here")
     } catch (error) {
