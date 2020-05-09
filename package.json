@@ -15,7 +15,7 @@
         "typescript"
     ],
     "license": "ISC",
-    "main": "index.js",
+    "main": "dist/index.js",
     "dependencies": {
         "@actions/core": "^1.2.4",
         "@actions/github": "^2.2.0",
