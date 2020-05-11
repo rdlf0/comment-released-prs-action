@@ -26,7 +26,9 @@ async function run(): Promise<void> {
         const prs = await getReleasedPRs(octokit, base, head);
 
         if (prs) {
-            core.setOutput("pr-ids", prs.map(pr => pr.number));
+            const prIds = prs.map(pr => pr.number);
+            console.log(prIds);
+            core.setOutput("pr-ids", prIds);
         } else {
             core.setOutput("pr-ids", []);
         }
