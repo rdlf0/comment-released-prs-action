@@ -1,6 +1,10 @@
 name: "Comment the Released PRs"
 description: "Walks through all PRs in a release and adds a comment about the release"
 author: "Radoslav Stoyanov <r.stoyanov@outlook.com>"
+inputs: 
+  repo-token:
+    description: 'The GITHUB_TOKEN secret'
+    required: true
 outputs:
   pr-ids:
     description: "IDs of the PRs that were commented"

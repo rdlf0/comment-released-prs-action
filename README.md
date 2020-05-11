@@ -2,6 +2,12 @@
 
 This action iterates through all PRs that are part of a release and adds a comment to each of them containing information about the release.
 
+## Inputs
+
+### repo-token
+
+**Required** The GITHUB_TOKEN secret.
+
 ## Outputs
 
 ### `pr-ids`

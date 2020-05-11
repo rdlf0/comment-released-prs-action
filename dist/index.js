@@ -24879,35 +24879,82 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // const token = process.env.GITHUB_TOKEN;
-            // if (token === undefined) {
-            //     core.error("Missing GitHub token");
-            //     return;
-            // }
-            // 
-            // const octokit = new github.GitHub(token);
-            // const release = await octokit.repos.getRelease();
-            // const {
-            //     data: {
-            //         id: releaseId, tag_name: releaseTag
-            //     }
-            // } = release;
-            console.log("HELLLO!");
-            console.log(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload);
-            const payload = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload;
-            const release = payload.release;
-            console.log(`Release ID=${release.id}, tag=${release.tag_name}`);
-            console.log(release.id);
-            console.log(release.author.login);
-            console.log(release.tag_name);
-            console.log(release.assets_url);
-            console.log("Here's the whole payload:");
-            console.log(release);
-            // core.setOutput("pr-ids", "Some IDs will come here")
+            const token = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('repo-token', { required: true });
+            const octokit = new _actions_github__WEBPACK_IMPORTED_MODULE_1__.GitHub(token);
+            const currentRelease = getCurrentRelease();
+            const head = currentRelease.tag_name;
+            console.log(`Current release tag=${currentRelease.tag_name}`);
+            const previousRelease = yield getPreviousRelease(octokit);
+            let base;
+            if (previousRelease) {
+                base = previousRelease.tag_name;
+                console.log(`Previous release tag=${previousRelease.tag_name}`);
+            }
+            else {
+                console.log("Previous release not found.");
+            }
+            const prs = yield getReleasedPRs(octokit, base, head);
+            if (prs) {
+                _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("pr-ids", prs.map(pr => pr.number));
+            }
+            else {
+                _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("pr-ids", []);
+            }
         }
         catch (error) {
-            Object(_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(error.message);
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
         }
+    });
+}
+function getCurrentRelease() {
+    const payload = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload;
+    return payload.release;
+}
+function getPreviousRelease(client) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const responseReleases = yield client.repos.listReleases({
+            owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+            repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+            per_page: 2,
+            page: 1
+        });
+        const releases = responseReleases.data;
+        if (releases.length < 2) {
+            return undefined;
+        }
+        return releases[1];
+    });
+}
+function getReleasedPRs(client, base, head) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let commits;
+        if (base == undefined) {
+            const responseCommits = yield client.repos.listCommits({
+                owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+                repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+                sha: head
+            });
+            commits = responseCommits.data;
+        }
+        else {
+            const responseCommits = yield client.repos.compareCommits({
+                owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+                repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+                base: base,
+                head: head
+            });
+            commits = responseCommits.data.commits;
+        }
+        let prs = [];
+        for (const commit of commits) {
+            const responsePRs = yield client.repos.listPullRequestsAssociatedWithCommit({
+                owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+                repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+                commit_sha: commit.sha
+            });
+            prs = prs.concat(responsePRs.data);
+        }
+        return prs;
     });
 }
 run();
