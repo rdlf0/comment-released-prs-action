@@ -24895,6 +24895,7 @@ function run() {
             }
             const prs = yield getReleasedPRs(octokit, base, head);
             if (prs) {
+                addCommentsToPRs(octokit, prs, currentRelease);
                 const prIds = prs.map(pr => pr.number);
                 console.log(prIds);
                 _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("pr-ids", prIds);
@@ -24914,12 +24915,7 @@ function getCurrentRelease() {
 }
 function getPreviousRelease(client) {
     return __awaiter(this, void 0, void 0, function* () {
-        const responseReleases = yield client.repos.listReleases({
-            owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-            repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
-            per_page: 2,
-            page: 1
-        });
+        const responseReleases = yield client.repos.listReleases(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo, { per_page: 2, page: 1 }));
         const releases = responseReleases.data;
         if (releases.length < 2) {
             return undefined;
@@ -24929,34 +24925,48 @@ function getPreviousRelease(client) {
 }
 function getReleasedPRs(client, base, head) {
     return __awaiter(this, void 0, void 0, function* () {
-        let commits;
-        if (base == undefined) {
-            const responseCommits = yield client.repos.listCommits({
-                owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-                repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
-                sha: head
-            });
-            commits = responseCommits.data;
-        }
-        else {
-            const responseCommits = yield client.repos.compareCommits({
-                owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-                repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
-                base: base,
-                head: head
-            });
-            commits = responseCommits.data.commits;
-        }
+        // let commits;
+        // if (base == undefined) {
+        //     const responseCommits = await client.repos.listCommits({
+        //         ...github.context.repo,
+        //         sha: head
+        //     });
+        //     commits = responseCommits.data;
+        // } else {
+        //     const responseCommits = await client.repos.compareCommits({
+        //         ...github.context.repo,
+        //         base: base,
+        //         head: head
+        //     });
+        //     commits = responseCommits.data.commits;
+        // }
         let prs = [];
-        for (const commit of commits) {
-            const responsePRs = yield client.repos.listPullRequestsAssociatedWithCommit({
-                owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-                repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
-                commit_sha: commit.sha
-            });
-            prs = prs.concat(responsePRs.data);
-        }
+        // for (const commit of commits) {
+        //     const responsePRs = await client.repos.listPullRequestsAssociatedWithCommit({
+        //         ...github.context.repo,
+        //         commit_sha: commit.sha
+        //     });
+        //     prs = prs.concat(responsePRs.data);
+        // }
+        const responsePR = yield client.pulls.get({
+            owner: "rdlf0",
+            repo: "minesweeper",
+            pull_number: 20
+        });
+        prs.push(responsePR.data);
         return prs;
+    });
+}
+function addCommentsToPRs(client, prs, release) {
+    return __awaiter(this, void 0, void 0, function* () {
+        prs.slice(0).forEach(pr => {
+            client.issues.createComment({
+                owner: "rdlf0",
+                repo: "minesweeper",
+                issue_number: pr.number,
+                body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
+            });
+        });
     });
 }
 run();

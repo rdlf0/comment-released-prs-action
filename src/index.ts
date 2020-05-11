@@ -26,6 +26,8 @@ async function run(): Promise<void> {
         const prs = await getReleasedPRs(octokit, base, head);
 
         if (prs) {
+            addCommentsToPRs(octokit, prs, currentRelease);
+
             const prIds = prs.map(pr => pr.number);
             console.log(prIds);
             core.setOutput("pr-ids", prIds);
@@ -45,8 +47,7 @@ function getCurrentRelease(): Release {
 
 async function getPreviousRelease(client: github.GitHub) {
     const responseReleases = await client.repos.listReleases({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
+        ...github.context.repo,
         per_page: 2,
         page: 1
     });
@@ -61,39 +62,55 @@ async function getPreviousRelease(client: github.GitHub) {
 }
 
 async function getReleasedPRs(client: github.GitHub, base: string | undefined, head: string) {
-    let commits;
+    // let commits;
 
-    if (base == undefined) {
-        const responseCommits = await client.repos.listCommits({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            sha: head
-        });
+    // if (base == undefined) {
+    //     const responseCommits = await client.repos.listCommits({
+    //         ...github.context.repo,
+    //         sha: head
+    //     });
 
-        commits = responseCommits.data;
-    } else {
-        const responseCommits = await client.repos.compareCommits({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            base: base,
-            head: head
-        });
+    //     commits = responseCommits.data;
+    // } else {
+    //     const responseCommits = await client.repos.compareCommits({
+    //         ...github.context.repo,
+    //         base: base,
+    //         head: head
+    //     });
 
-        commits = responseCommits.data.commits;
-    }
+    //     commits = responseCommits.data.commits;
+    // }
 
     let prs: any[] = [];
-    for (const commit of commits) {
-        const responsePRs = await client.repos.listPullRequestsAssociatedWithCommit({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            commit_sha: commit.sha
-        });
+    // for (const commit of commits) {
+    //     const responsePRs = await client.repos.listPullRequestsAssociatedWithCommit({
+    //         ...github.context.repo,
+    //         commit_sha: commit.sha
+    //     });
 
-        prs = prs.concat(responsePRs.data);
-    }
+    //     prs = prs.concat(responsePRs.data);
+    // }
+
+    const responsePR = await client.pulls.get({
+        owner: "rdlf0",
+        repo: "minesweeper",
+        pull_number: 20
+    });
+
+    prs.push(responsePR.data);
 
     return prs;
+}
+
+async function addCommentsToPRs(client: github.GitHub, prs: any[], release: any) {
+    prs.slice(0).forEach(pr => {
+        client.issues.createComment({
+            owner: "rdlf0",
+            repo: "minesweeper",
+            issue_number: pr.number,
+            body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
+        });
+    });
 }
 
 run()
