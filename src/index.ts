@@ -102,14 +102,15 @@ async function getReleasedPRs(client: github.GitHub, base: string | undefined, h
 
 async function addCommentsToPRs(client: github.GitHub, prs: any[], release: any) {
     for (let pr of prs) {
-        const responseComment = await client.issues.createComment({
-            owner: "rdlf0",
-            repo: "minesweeper",
-            issue_number: pr.number,
-            body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
-        });
+        // const responseComment = await client.issues.createComment({
+        //     owner: "rdlf0",
+        //     repo: "minesweeper",
+        //     issue_number: pr.number,
+        //     body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
+        // });
 
-        core.debug(`Resposne code: ${responseComment.status.toString()}`);
+        // core.debug(`Resposne code: ${responseComment.status.toString()}`);
+        core.debug(`PR number: ${pr.number}`);
     }
 }
 

@@ -24959,13 +24959,14 @@ function getReleasedPRs(client, base, head) {
 function addCommentsToPRs(client, prs, release) {
     return __awaiter(this, void 0, void 0, function* () {
         for (let pr of prs) {
-            const responseComment = yield client.issues.createComment({
-                owner: "rdlf0",
-                repo: "minesweeper",
-                issue_number: pr.number,
-                body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
-            });
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Resposne code: ${responseComment.status.toString()}`);
+            // const responseComment = await client.issues.createComment({
+            //     owner: "rdlf0",
+            //     repo: "minesweeper",
+            //     issue_number: pr.number,
+            //     body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
+            // });
+            // core.debug(`Resposne code: ${responseComment.status.toString()}`);
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`PR number: ${pr.number}`);
         }
     });
 }
