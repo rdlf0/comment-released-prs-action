@@ -24915,8 +24915,7 @@ function getCurrentRelease() {
 }
 function getPreviousRelease(client) {
     return __awaiter(this, void 0, void 0, function* () {
-        const responseReleases = yield client.repos.listReleases(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo, { per_page: 2, page: 1 }));
-        const releases = responseReleases.data;
+        const { data: releases } = yield client.repos.listReleases(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo, { per_page: 2, page: 1 }));
         if (releases.length < 2) {
             return undefined;
         }
@@ -24966,7 +24965,7 @@ function addCommentsToPRs(client, prs, release) {
                 issue_number: pr.number,
                 body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
             });
-            console.log(`Resposne code: ${responseComment.status.toString()}`);
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Resposne code: ${responseComment.status.toString()}`);
         }
     });
 }

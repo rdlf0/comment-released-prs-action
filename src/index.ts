@@ -1,8 +1,8 @@
 import * as core from "@actions/core"
 import * as github from "@actions/github"
 import {
-    WebhookPayloadRelease as PayloadRelease,
-    WebhookPayloadReleaseRelease as Release,
+    WebhookPayloadRelease,
+    WebhookPayloadReleaseRelease
 } from "@octokit/webhooks"
 
 async function run(): Promise<void> {
@@ -10,7 +10,7 @@ async function run(): Promise<void> {
         const token = core.getInput('repo-token', { required: true });
         const octokit = new github.GitHub(token);
 
-        const currentRelease: Release = getCurrentRelease();
+        const currentRelease: WebhookPayloadReleaseRelease = getCurrentRelease();
         const head = currentRelease.tag_name;
         console.log(`Current release tag=${currentRelease.tag_name}`);
 
@@ -39,20 +39,18 @@ async function run(): Promise<void> {
     }
 }
 
-function getCurrentRelease(): Release {
-    const payload: PayloadRelease = github.context.payload as PayloadRelease;
+function getCurrentRelease(): WebhookPayloadReleaseRelease {
+    const payload: WebhookPayloadRelease = github.context.payload as WebhookPayloadRelease;
 
     return payload.release;
 }
 
 async function getPreviousRelease(client: github.GitHub) {
-    const responseReleases = await client.repos.listReleases({
+    const { data: releases } = await client.repos.listReleases({
         ...github.context.repo,
         per_page: 2,
         page: 1
     });
-
-    const releases = responseReleases.data;
 
     if (releases.length < 2) {
         return undefined;
@@ -111,7 +109,7 @@ async function addCommentsToPRs(client: github.GitHub, prs: any[], release: any)
             body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
         });
 
-        console.log(`Resposne code: ${responseComment.status.toString()}`);
+        core.debug(`Resposne code: ${responseComment.status.toString()}`);
     }
 }
 
