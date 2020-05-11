@@ -103,14 +103,16 @@ async function getReleasedPRs(client: github.GitHub, base: string | undefined, h
 }
 
 async function addCommentsToPRs(client: github.GitHub, prs: any[], release: any) {
-    prs.slice(0).forEach(pr => {
-        client.issues.createComment({
+    for (let pr of prs) {
+        const responseComment = await client.issues.createComment({
             owner: "rdlf0",
             repo: "minesweeper",
             issue_number: pr.number,
             body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
         });
-    });
+
+        core.debug(responseComment.status.toString());
+    }
 }
 
 run()

@@ -24959,14 +24959,15 @@ function getReleasedPRs(client, base, head) {
 }
 function addCommentsToPRs(client, prs, release) {
     return __awaiter(this, void 0, void 0, function* () {
-        prs.slice(0).forEach(pr => {
-            client.issues.createComment({
+        for (let pr of prs) {
+            const responseComment = yield client.issues.createComment({
                 owner: "rdlf0",
                 repo: "minesweeper",
                 issue_number: pr.number,
                 body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
             });
-        });
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(responseComment.status.toString());
+        }
     });
 }
 run();
