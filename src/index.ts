@@ -111,7 +111,7 @@ async function addCommentsToPRs(client: github.GitHub, prs: any[], release: any)
             body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
         });
 
-        core.debug(responseComment.status.toString());
+        console.log(`Resposne code: ${responseComment.status.toString()}`);
     }
 }
 

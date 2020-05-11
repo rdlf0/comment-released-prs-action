@@ -24966,7 +24966,7 @@ function addCommentsToPRs(client, prs, release) {
                 issue_number: pr.number,
                 body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
             });
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(responseComment.status.toString());
+            console.log(`Resposne code: ${responseComment.status.toString()}`);
         }
     });
 }
