@@ -24895,7 +24895,9 @@ function run() {
             }
             const prs = yield getReleasedPRs(octokit, base, head);
             if (prs) {
-                _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("pr-ids", prs.map(pr => pr.number));
+                const prIds = prs.map(pr => pr.number);
+                console.log(prIds);
+                _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("pr-ids", prIds);
             }
             else {
                 _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("pr-ids", []);
