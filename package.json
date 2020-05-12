@@ -7,6 +7,9 @@
         "type": "git",
         "url": "git@github.com:rdlf0/comment-released-prs-action.git"
     },
+    "scripts": {
+        "compile": "tsc src/index.ts && ncc build src/index.js"
+    },
     "keywords": [
         "actions",
         "release",
@@ -20,5 +23,9 @@
         "@actions/core": "^1.2.4",
         "@actions/github": "^2.2.0",
         "@octokit/webhooks": "^7.5.0"
+    },
+    "devDependencies": {
+        "@zeit/ncc": "^0.22.1",
+        "typescript": "^3.8.3"
     }
 }
