@@ -69,7 +69,8 @@ async function getReleasedPRs(
     if (base == undefined) {
         const responseCommits = await client.repos.listCommits({
             ...github.context.repo,
-            sha: head
+            sha: head,
+            per_page: 50
         });
 
         commits = responseCommits.data;
@@ -96,6 +97,8 @@ async function getReleasedPRs(
             prsById.set(pr.number, pr);
         });
     });
+
+    core.debug(`Found PRs: ${Array.from(prsById.keys()).toString()}`);
 
     return prsById;
 }

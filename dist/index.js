@@ -8695,7 +8695,7 @@ function getReleasedPRs(client, base, head) {
             switch (_a.label) {
                 case 0:
                     if (!(base == undefined)) return [3 /*break*/, 2];
-                    return [4 /*yield*/, client.repos.listCommits(__assign(__assign({}, github.context.repo), { sha: head }))];
+                    return [4 /*yield*/, client.repos.listCommits(__assign(__assign({}, github.context.repo), { sha: head, per_page: 50 }))];
                 case 1:
                     responseCommits = _a.sent();
                     commits = responseCommits.data;
@@ -8723,6 +8723,7 @@ function getReleasedPRs(client, base, head) {
                             }
                         });
                     }); });
+                    core.debug("Found PRs: " + Array.from(prsById.keys()).toString());
                     return [2 /*return*/, prsById];
             }
         });
