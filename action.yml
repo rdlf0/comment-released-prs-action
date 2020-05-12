@@ -3,7 +3,7 @@ description: "Walks through all PRs in a release and adds a comment about the re
 author: "Radoslav Stoyanov <r.stoyanov@outlook.com>"
 inputs: 
   repo-token:
-    description: 'The GITHUB_TOKEN secret'
+    description: "The GITHUB_TOKEN secret"
     required: true
 outputs:
   pr-ids:
