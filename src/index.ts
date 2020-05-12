@@ -11,28 +11,28 @@ async function run(): Promise<void> {
         console.log(github.context);
         console.log(process.env);
 
-        const token = core.getInput('repo-token', { required: true });
-        const octokit = new github.GitHub(token);
+        // const token = core.getInput('repo-token', { required: true });
+        // const octokit = new github.GitHub(token);
 
-        const currentRelease: WebhookPayloadReleaseRelease = getCurrentRelease();
-        core.debug(`Current release tag=${currentRelease.tag_name}`);
+        // const currentRelease: WebhookPayloadReleaseRelease = getCurrentRelease();
+        // core.debug(`Current release tag=${currentRelease.tag_name}`);
 
-        const previousRelease = await getPreviousRelease(octokit);
-        if (previousRelease) {
-            core.debug(`Previous release tag=${previousRelease.tag_name}`);
-        } else {
-            core.debug("Previous release not found.");
-        }
+        // const previousRelease = await getPreviousRelease(octokit);
+        // if (previousRelease) {
+        //     core.debug(`Previous release tag=${previousRelease.tag_name}`);
+        // } else {
+        //     core.debug("Previous release not found.");
+        // }
 
-        const prsById = await getReleasedPRs(
-            octokit,
-            previousRelease?.tag_name,
-            currentRelease.tag_name
-        );
+        // const prsById = await getReleasedPRs(
+        //     octokit,
+        //     previousRelease?.tag_name,
+        //     currentRelease.tag_name
+        // );
 
-        await addCommentsToPRs(octokit, prsById, currentRelease);
+        // await addCommentsToPRs(octokit, prsById, currentRelease);
 
-        core.setOutput("pr-ids", Array.from(prsById.keys()));
+        // core.setOutput("pr-ids", Array.from(prsById.keys()));
     } catch (error) {
         core.setFailed(error.message)
     }
