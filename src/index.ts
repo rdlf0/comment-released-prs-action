@@ -8,40 +8,40 @@ import {
 
 async function run(): Promise<void> {
     try {
-        console.log(github.context);
-        console.log(process.env);
+        const payload = github.context.payload as WebhookPayloadRelease;
+        const event = github.context.eventName;
+        const action = payload.action;
 
-        // const token = core.getInput('repo-token', { required: true });
-        // const octokit = new github.GitHub(token);
+        if (event != "release" || action != "published") {
+            core.error(`This action is meant to run only when a release is being published. Current event='${event}'; current action='${action}'`);
+            return;
+        }
 
-        // const currentRelease: WebhookPayloadReleaseRelease = getCurrentRelease();
-        // core.debug(`Current release tag=${currentRelease.tag_name}`);
+        const token = core.getInput('repo-token', { required: true });
+        const octokit = new github.GitHub(token);
 
-        // const previousRelease = await getPreviousRelease(octokit);
-        // if (previousRelease) {
-        //     core.debug(`Previous release tag=${previousRelease.tag_name}`);
-        // } else {
-        //     core.debug("Previous release not found.");
-        // }
+        const currentRelease: WebhookPayloadReleaseRelease = payload.release;
+        core.debug(`Current release tag=${currentRelease.tag_name}`);
 
-        // const prsById = await getReleasedPRs(
-        //     octokit,
-        //     previousRelease?.tag_name,
-        //     currentRelease.tag_name
-        // );
+        const previousRelease = await getPreviousRelease(octokit);
+        if (previousRelease) {
+            core.debug(`Previous release tag=${previousRelease.tag_name}`);
+        } else {
+            core.debug("Previous release not found.");
+        }
 
-        // await addCommentsToPRs(octokit, prsById, currentRelease);
+        const prsById = await getReleasedPRs(
+            octokit,
+            previousRelease?.tag_name,
+            currentRelease.tag_name
+        );
 
-        // core.setOutput("pr-ids", Array.from(prsById.keys()));
+        await addCommentsToPRs(octokit, prsById, currentRelease);
+
+        core.setOutput("pr-ids", Array.from(prsById.keys()));
     } catch (error) {
         core.setFailed(error.message)
     }
-}
-
-function getCurrentRelease(): WebhookPayloadReleaseRelease {
-    const payload = github.context.payload as WebhookPayloadRelease;
-
-    return payload.release;
 }
 
 async function getPreviousRelease(

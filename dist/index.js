@@ -8632,38 +8632,47 @@ var core = __webpack_require__(470);
 var github = __webpack_require__(469);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
+        var payload, event_1, action, token, octokit, currentRelease, previousRelease, prsById, error_1;
         return __generator(this, function (_a) {
-            try {
-                console.log(github.context);
-                console.log(process.env);
-                // const token = core.getInput('repo-token', { required: true });
-                // const octokit = new github.GitHub(token);
-                // const currentRelease: WebhookPayloadReleaseRelease = getCurrentRelease();
-                // core.debug(`Current release tag=${currentRelease.tag_name}`);
-                // const previousRelease = await getPreviousRelease(octokit);
-                // if (previousRelease) {
-                //     core.debug(`Previous release tag=${previousRelease.tag_name}`);
-                // } else {
-                //     core.debug("Previous release not found.");
-                // }
-                // const prsById = await getReleasedPRs(
-                //     octokit,
-                //     previousRelease?.tag_name,
-                //     currentRelease.tag_name
-                // );
-                // await addCommentsToPRs(octokit, prsById, currentRelease);
-                // core.setOutput("pr-ids", Array.from(prsById.keys()));
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 4, , 5]);
+                    payload = github.context.payload;
+                    event_1 = github.context.eventName;
+                    action = payload.action;
+                    if (event_1 != "release" || action != "published") {
+                        core.error("This action is meant to run only when a release is being published. Current event='" + event_1 + "'; current action='" + action + "'");
+                        return [2 /*return*/];
+                    }
+                    token = core.getInput('repo-token', { required: true });
+                    octokit = new github.GitHub(token);
+                    currentRelease = payload.release;
+                    core.debug("Current release tag=" + currentRelease.tag_name);
+                    return [4 /*yield*/, getPreviousRelease(octokit)];
+                case 1:
+                    previousRelease = _a.sent();
+                    if (previousRelease) {
+                        core.debug("Previous release tag=" + previousRelease.tag_name);
+                    }
+                    else {
+                        core.debug("Previous release not found.");
+                    }
+                    return [4 /*yield*/, getReleasedPRs(octokit, previousRelease === null || previousRelease === void 0 ? void 0 : previousRelease.tag_name, currentRelease.tag_name)];
+                case 2:
+                    prsById = _a.sent();
+                    return [4 /*yield*/, addCommentsToPRs(octokit, prsById, currentRelease)];
+                case 3:
+                    _a.sent();
+                    core.setOutput("pr-ids", Array.from(prsById.keys()));
+                    return [3 /*break*/, 5];
+                case 4:
+                    error_1 = _a.sent();
+                    core.setFailed(error_1.message);
+                    return [3 /*break*/, 5];
+                case 5: return [2 /*return*/];
             }
-            catch (error) {
-                core.setFailed(error.message);
-            }
-            return [2 /*return*/];
         });
     });
-}
-function getCurrentRelease() {
-    var payload = github.context.payload;
-    return payload.release;
 }
 function getPreviousRelease(client) {
     return __awaiter(this, void 0, void 0, function () {
