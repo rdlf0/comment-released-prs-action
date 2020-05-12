@@ -73,6 +73,7 @@ async function getReleasedPRs(
         });
 
         commits = responseCommits.data;
+        core.debug(`Found ${commits.length} commits when listed from head=${head}`);
     } else {
         const responseCommits = await client.repos.compareCommits({
             ...github.context.repo,
@@ -81,6 +82,7 @@ async function getReleasedPRs(
         });
 
         commits = responseCommits.data.commits;
+        core.debug(`Found ${commits.length} commits when compared base=${base} and head=${head}`);
     }
 
     let prsById: Map<number, Octokit.ReposListPullRequestsAssociatedWithCommitResponseItem> = new Map();

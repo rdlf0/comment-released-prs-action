@@ -8699,11 +8699,13 @@ function getReleasedPRs(client, base, head) {
                 case 1:
                     responseCommits = _a.sent();
                     commits = responseCommits.data;
+                    core.debug("Found " + commits.length + " commits when listed from head=" + head);
                     return [3 /*break*/, 4];
                 case 2: return [4 /*yield*/, client.repos.compareCommits(__assign(__assign({}, github.context.repo), { base: base, head: head }))];
                 case 3:
                     responseCommits = _a.sent();
                     commits = responseCommits.data.commits;
+                    core.debug("Found " + commits.length + " commits when compared base=" + base + " and head=" + head);
                     _a.label = 4;
                 case 4:
                     prsById = new Map();
