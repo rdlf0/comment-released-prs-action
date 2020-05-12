@@ -8637,6 +8637,8 @@ function run() {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 4, , 5]);
+                    console.log(github.context);
+                    console.log(process.env);
                     token = core.getInput('repo-token', { required: true });
                     octokit = new github.GitHub(token);
                     currentRelease = getCurrentRelease();

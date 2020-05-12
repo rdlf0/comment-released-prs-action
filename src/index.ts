@@ -8,6 +8,9 @@ import {
 
 async function run(): Promise<void> {
     try {
+        console.log(github.context);
+        console.log(process.env);
+
         const token = core.getInput('repo-token', { required: true });
         const octokit = new github.GitHub(token);
 
