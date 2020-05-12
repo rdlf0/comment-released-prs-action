@@ -8689,8 +8689,7 @@ function getPreviousRelease(client) {
 }
 function getReleasedPRs(client, base, head) {
     return __awaiter(this, void 0, void 0, function () {
-        var commits, responseCommits, responseCommits, prsById;
-        var _this = this;
+        var commits, responseCommits, responseCommits, prsById, _i, commits_1, commit, prs;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -8709,22 +8708,22 @@ function getReleasedPRs(client, base, head) {
                     _a.label = 4;
                 case 4:
                     prsById = new Map();
-                    commits.forEach(function (commit) { return __awaiter(_this, void 0, void 0, function () {
-                        var prs;
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0: return [4 /*yield*/, client.repos.listPullRequestsAssociatedWithCommit(__assign(__assign({}, github.context.repo), { commit_sha: commit.sha }))];
-                                case 1:
-                                    prs = (_a.sent()).data;
-                                    prs.forEach(function (pr) {
-                                        prsById.set(pr.number, pr);
-                                    });
-                                    return [2 /*return*/];
-                            }
-                        });
-                    }); });
-                    core.debug("Found PRs: " + Array.from(prsById.keys()).toString());
-                    return [2 /*return*/, prsById];
+                    _i = 0, commits_1 = commits;
+                    _a.label = 5;
+                case 5:
+                    if (!(_i < commits_1.length)) return [3 /*break*/, 8];
+                    commit = commits_1[_i];
+                    return [4 /*yield*/, client.repos.listPullRequestsAssociatedWithCommit(__assign(__assign({}, github.context.repo), { commit_sha: commit.sha }))];
+                case 6:
+                    prs = (_a.sent()).data;
+                    prs.forEach(function (pr) {
+                        prsById.set(pr.number, pr);
+                    });
+                    _a.label = 7;
+                case 7:
+                    _i++;
+                    return [3 /*break*/, 5];
+                case 8: return [2 /*return*/, prsById];
             }
         });
     });

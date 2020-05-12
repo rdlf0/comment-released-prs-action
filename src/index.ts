@@ -87,7 +87,7 @@ async function getReleasedPRs(
     }
 
     let prsById: Map<number, Octokit.ReposListPullRequestsAssociatedWithCommitResponseItem> = new Map();
-    commits.forEach(async commit => {
+    for (const commit of commits) {
         const { data: prs } = await client.repos.listPullRequestsAssociatedWithCommit({
             ...github.context.repo,
             commit_sha: commit.sha
@@ -96,9 +96,7 @@ async function getReleasedPRs(
         prs.forEach(pr => {
             prsById.set(pr.number, pr);
         });
-    });
-
-    core.debug(`Found PRs: ${Array.from(prsById.keys()).toString()}`);
+    }
 
     return prsById;
 }
