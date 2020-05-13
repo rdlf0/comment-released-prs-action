@@ -20,7 +20,7 @@ async function run(): Promise<void> {
         const token = core.getInput('repo-token', { required: true });
         const octokit = new github.GitHub(token);
 
-        const currentRelease: WebhookPayloadReleaseRelease = payload.release;
+        const currentRelease = payload.release;
         core.debug(`Current release tag=${currentRelease.tag_name}`);
 
         const previousRelease = await getPreviousRelease(octokit);
@@ -30,15 +30,15 @@ async function run(): Promise<void> {
             core.debug("Previous release not found.");
         }
 
-        const prsById = await getReleasedPRs(
+        const prsByNumber = await getReleasedPRs(
             octokit,
             previousRelease?.tag_name,
             currentRelease.tag_name
         );
 
-        await addCommentsToPRs(octokit, prsById, currentRelease);
+        await addCommentsToPRs(octokit, prsByNumber, currentRelease);
 
-        core.setOutput("pr-ids", Array.from(prsById.keys()));
+        core.setOutput("pr-ids", Array.from(prsByNumber.keys()));
     } catch (error) {
         core.setFailed(error.message)
     }
@@ -73,7 +73,8 @@ async function getReleasedPRs(
         const responseCommits = await client.repos.listCommits({
             ...github.context.repo,
             sha: head,
-            per_page: 50
+            per_page: 50,
+            page: 1
         });
 
         commits = responseCommits.data;
@@ -89,7 +90,7 @@ async function getReleasedPRs(
         core.debug(`Found ${commits.length} commits when compared base=${base} and head=${head}`);
     }
 
-    let prsById: Map<number, Octokit.ReposListPullRequestsAssociatedWithCommitResponseItem> = new Map();
+    const prsByNumber: Map<number, Octokit.ReposListPullRequestsAssociatedWithCommitResponseItem> = new Map();
     for (const commit of commits) {
         const { data: prs } = await client.repos.listPullRequestsAssociatedWithCommit({
             ...github.context.repo,
@@ -97,18 +98,18 @@ async function getReleasedPRs(
         });
 
         prs.forEach(pr => {
-            prsById.set(pr.number, pr);
+            prsByNumber.set(pr.number, pr);
         });
     }
 
-    return prsById;
+    return prsByNumber;
 }
 
 async function addCommentsToPRs(
     client: github.GitHub,
     prs: Map<number, Octokit.ReposListPullRequestsAssociatedWithCommitResponseItem>,
     release: WebhookPayloadReleaseRelease
-) {
+): Promise<void> {
 
     prs.forEach(async pr => {
         const responseComment = await client.issues.createComment({
