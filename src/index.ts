@@ -3,7 +3,7 @@ import * as github from "@actions/github"
 import { Octokit } from "@octokit/rest"
 import {
     WebhookPayloadRelease,
-    WebhookPayloadReleaseRelease
+    WebhookPayloadReleaseRelease,
 } from "@octokit/webhooks"
 
 async function run(): Promise<void> {
@@ -13,11 +13,13 @@ async function run(): Promise<void> {
         const action = payload.action;
 
         if (event != "release" || action != "published") {
-            core.error(`This action is meant to run only when a release is being published. Current event='${event}'; current action='${action}'`);
+            core.error(
+                `This action is meant to run only when a release is being published. Current event="${event}"; Current action="${action}"`
+            );
             return;
         }
 
-        const token = core.getInput('repo-token', { required: true });
+        const token = core.getInput("repo-token", { required: true });
         const octokit = new github.GitHub(token);
 
         const currentRelease = payload.release;
@@ -33,7 +35,7 @@ async function run(): Promise<void> {
         const prsByNumber = await getReleasedPRs(
             octokit,
             previousRelease?.tag_name,
-            currentRelease.tag_name
+            currentRelease.tag_name,
         );
 
         await addCommentsToPRs(octokit, prsByNumber, currentRelease);
@@ -45,13 +47,15 @@ async function run(): Promise<void> {
 }
 
 async function getPreviousRelease(
-    client: github.GitHub
+    client: github.GitHub,
 ): Promise<Octokit.ReposListReleasesResponseItem | undefined> {
 
-    const { data: releases } = await client.repos.listReleases({
+    const {
+        data: releases
+    } = await client.repos.listReleases({
         ...github.context.repo,
         per_page: 2,
-        page: 1
+        page: 1,
     });
 
     if (releases.length < 2) {
@@ -64,7 +68,7 @@ async function getPreviousRelease(
 async function getReleasedPRs(
     client: github.GitHub,
     base: string | undefined,
-    head: string
+    head: string,
 ): Promise<Map<number, Octokit.ReposListPullRequestsAssociatedWithCommitResponseItem>> {
 
     let commits;
@@ -74,7 +78,7 @@ async function getReleasedPRs(
             ...github.context.repo,
             sha: head,
             per_page: 50,
-            page: 1
+            page: 1,
         });
 
         commits = responseCommits.data;
@@ -83,7 +87,7 @@ async function getReleasedPRs(
         const responseCommits = await client.repos.compareCommits({
             ...github.context.repo,
             base: base,
-            head: head
+            head: head,
         });
 
         commits = responseCommits.data.commits;
@@ -94,7 +98,7 @@ async function getReleasedPRs(
     for (const commit of commits) {
         const { data: prs } = await client.repos.listPullRequestsAssociatedWithCommit({
             ...github.context.repo,
-            commit_sha: commit.sha
+            commit_sha: commit.sha,
         });
 
         prs.forEach(pr => {
@@ -108,14 +112,14 @@ async function getReleasedPRs(
 async function addCommentsToPRs(
     client: github.GitHub,
     prs: Map<number, Octokit.ReposListPullRequestsAssociatedWithCommitResponseItem>,
-    release: WebhookPayloadReleaseRelease
+    release: WebhookPayloadReleaseRelease,
 ): Promise<void> {
 
     prs.forEach(async pr => {
         const responseComment = await client.issues.createComment({
             ...github.context.repo,
             issue_number: pr.number,
-            body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`
+            body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`,
         });
 
         core.debug(`Commented PR: ${pr.number}, resposne code: ${responseComment.status.toString()}`);

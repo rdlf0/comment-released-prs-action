@@ -38,6 +38,5 @@ jobs:
 The posted comment will look like this:  
 ![comment-preview](https://github.com/rdlf0/comment-released-prs-action/blob/master/assets/comment-preview.png)
 
-
 ## License
 The scripts and documentation in this project are released under the [MIT License](https://github.com/rdlf0/comment-released-prs-action/blob/master/LICENSE)
