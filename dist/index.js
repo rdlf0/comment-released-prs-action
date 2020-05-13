@@ -36,6 +36,8 @@ module.exports =
 /******/ 		// Load entry module and return exports
 /******/ 		return __webpack_require__(669);
 /******/ 	};
+/******/ 	// initialize runtime
+/******/ 	runtime(__webpack_require__);
 /******/
 /******/ 	// run startup
 /******/ 	return startup();
@@ -19933,54 +19935,50 @@ module.exports = class HttpError extends Error {
 /***/ }),
 
 /***/ 669:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
+/***/ (function(__unusedmodule, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(369);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(765);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
 
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const core = __importStar(__webpack_require__(369));
-const github = __importStar(__webpack_require__(765));
+
 async function run() {
     var _a;
     try {
-        const payload = github.context.payload;
-        const event = github.context.eventName;
+        const payload = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload;
+        const event = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.eventName;
         const action = payload.action;
         if (event != "release" || action != "published") {
-            core.error(`This action is meant to run only when a release is being published. Current event="${event}"; Current action="${action}"`);
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(`This action is meant to run only when a release is being published. Current event='${event}'; current action='${action}'`);
             return;
         }
-        const token = core.getInput("repo-token", { required: true });
-        const octokit = new github.GitHub(token);
+        const token = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('repo-token', { required: true });
+        const octokit = new _actions_github__WEBPACK_IMPORTED_MODULE_1__.GitHub(token);
         const currentRelease = payload.release;
-        core.debug(`Current release tag=${currentRelease.tag_name}`);
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Current release tag=${currentRelease.tag_name}`);
         const previousRelease = await getPreviousRelease(octokit);
         if (previousRelease) {
-            core.debug(`Previous release tag=${previousRelease.tag_name}`);
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Previous release tag=${previousRelease.tag_name}`);
         }
         else {
-            core.debug("Previous release not found.");
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("Previous release not found.");
         }
-        const prsByNumber = await getReleasedPRs(octokit, (_a = previousRelease) === null || _a === void 0 ? void 0 : _a.tag_name, currentRelease.tag_name);
-        await addCommentsToPRs(octokit, prsByNumber, currentRelease);
-        core.setOutput("pr-ids", Array.from(prsByNumber.keys()));
+        const prsById = await getReleasedPRs(octokit, (_a = previousRelease) === null || _a === void 0 ? void 0 : _a.tag_name, currentRelease.tag_name);
+        await addCommentsToPRs(octokit, prsById, currentRelease);
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("pr-ids", Array.from(prsById.keys()));
     }
     catch (error) {
-        core.setFailed(error.message);
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
     }
 }
 async function getPreviousRelease(client) {
     const { data: releases } = await client.repos.listReleases({
-        ...github.context.repo,
+        ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
         per_page: 2,
-        page: 1,
+        page: 1
     });
     if (releases.length < 2) {
         return undefined;
@@ -19991,43 +19989,42 @@ async function getReleasedPRs(client, base, head) {
     let commits;
     if (base == undefined) {
         const responseCommits = await client.repos.listCommits({
-            ...github.context.repo,
+            ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
             sha: head,
-            per_page: 50,
-            page: 1,
+            per_page: 50
         });
         commits = responseCommits.data;
-        core.debug(`Found ${commits.length} commits when listed from head=${head}`);
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Found ${commits.length} commits when listed from head=${head}`);
     }
     else {
         const responseCommits = await client.repos.compareCommits({
-            ...github.context.repo,
+            ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
             base: base,
-            head: head,
+            head: head
         });
         commits = responseCommits.data.commits;
-        core.debug(`Found ${commits.length} commits when compared base=${base} and head=${head}`);
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Found ${commits.length} commits when compared base=${base} and head=${head}`);
     }
-    const prsByNumber = new Map();
+    let prsById = new Map();
     for (const commit of commits) {
         const { data: prs } = await client.repos.listPullRequestsAssociatedWithCommit({
-            ...github.context.repo,
-            commit_sha: commit.sha,
+            ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
+            commit_sha: commit.sha
         });
         prs.forEach(pr => {
-            prsByNumber.set(pr.number, pr);
+            prsById.set(pr.number, pr);
         });
     }
-    return prsByNumber;
+    return prsById;
 }
 async function addCommentsToPRs(client, prs, release) {
     prs.forEach(async (pr) => {
         const responseComment = await client.issues.createComment({
-            ...github.context.repo,
+            ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
             issue_number: pr.number,
-            body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`,
+            body: `\u{1F389} Hooray! The changes in this pull request went live with the release of [${release.name}](${release.html_url}) \u{1F389}`,
         });
-        core.debug(`Commented PR: ${pr.number}, resposne code: ${responseComment.status.toString()}`);
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Commented PR: ${pr.number}, resposne code: ${responseComment.status.toString()}`);
     });
 }
 run();
@@ -24215,6 +24212,26 @@ function getValue(object, key) {
   return object == null ? undefined : object[key];
 }
 
+/** Used for built-in method references. */
+var arrayProto = Array.prototype,
+    funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to detect overreaching core-js shims. */
+var coreJsData = root['__core-js_shared__'];
+
+/** Used to detect methods masquerading as native. */
+var maskSrcKey = (function() {
+  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
+  return uid ? ('Symbol(src)_1.' + uid) : '';
+}());
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
 /**
  * Checks if `value` is a host object in IE < 9.
  *
@@ -25012,6 +25029,7 @@ function httpOverHttp(options) {
   agent.request = http.request;
   return agent;
 }
+util.inherits(TunnelingAgent, events.EventEmitter);
 
 function httpsOverHttp(options) {
   var agent = new TunnelingAgent(options);
@@ -25448,4 +25466,43 @@ exports.paginateRest = paginateRest;
 
 /***/ })
 
-/******/ });
+/******/ },
+/******/ function(__webpack_require__) { // webpackRuntimeModules
+/******/ 	"use strict";
+/******/ 
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	!function() {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = function(exports) {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	}();
+/******/ 	
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	!function() {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = function(module) {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				function getDefault() { return module['default']; } :
+/******/ 				function getModuleExports() { return module; };
+/******/ 			__webpack_require__.d(getter, 'a', getter);
+/******/ 			return getter;
+/******/ 		};
+/******/ 	}();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getter */
+/******/ 	!function() {
+/******/ 		// define getter function for harmony exports
+/******/ 		var hasOwnProperty = Object.prototype.hasOwnProperty;
+/******/ 		__webpack_require__.d = function(exports, name, getter) {
+/******/ 			if(!hasOwnProperty.call(exports, name)) {
+/******/ 				Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 			}
+/******/ 		};
+/******/ 	}();
+/******/ 	
+/******/ }
+);

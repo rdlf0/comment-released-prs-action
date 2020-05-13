@@ -119,7 +119,7 @@ async function addCommentsToPRs(
         const responseComment = await client.issues.createComment({
             ...github.context.repo,
             issue_number: pr.number,
-            body: `\u{1F389} This pull request has been released in [${release.name}](${release.html_url}) \u{1F389}`,
+            body: `\u{1F389} Hooray! The changes in this pull request went live with the release of [${release.name}](${release.html_url}) \u{1F389}`,
         });
 
         core.debug(`Commented PR: ${pr.number}, resposne code: ${responseComment.status.toString()}`);
