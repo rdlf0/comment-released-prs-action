@@ -38,9 +38,5 @@ jobs:
 The posted comment will look like this:  
 ![comment-preview](https://github.com/rdlf0/comment-released-prs-action/blob/master/assets/comment-preview.png)
 
-## To-do
-- Check if a PR has already been commented by this action
-- When a released has been unpublished - delete comments
-
 ## License
 The scripts and documentation in this project are released under the [MIT License](https://github.com/rdlf0/comment-released-prs-action/blob/master/LICENSE)
