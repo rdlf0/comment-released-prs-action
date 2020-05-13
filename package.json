@@ -8,7 +8,7 @@
         "url": "git+https://github.com/rdlf0/comment-released-prs-action"
     },
     "scripts": {
-        "compile": "tsc src/index.ts && ncc build src/index.js"
+        "compile": "tsc && ncc build"
     },
     "keywords": [
         "actions",
