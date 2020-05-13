@@ -24212,6 +24212,26 @@ function getValue(object, key) {
   return object == null ? undefined : object[key];
 }
 
+/** Used for built-in method references. */
+var arrayProto = Array.prototype,
+    funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to detect overreaching core-js shims. */
+var coreJsData = root['__core-js_shared__'];
+
+/** Used to detect methods masquerading as native. */
+var maskSrcKey = (function() {
+  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
+  return uid ? ('Symbol(src)_1.' + uid) : '';
+}());
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
 /**
  * Checks if `value` is a host object in IE < 9.
  *
@@ -25009,6 +25029,7 @@ function httpOverHttp(options) {
   agent.request = http.request;
   return agent;
 }
+util.inherits(TunnelingAgent, events.EventEmitter);
 
 function httpsOverHttp(options) {
   var agent = new TunnelingAgent(options);
