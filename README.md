@@ -18,7 +18,7 @@ List of the IDs of the commented PRs
 This action runs only when triggered by a `release` event and a `published` action.
 
 ```yml
-name: Comment released PRs
+name: Comment on released PRs
 
 on:
   release:
@@ -27,10 +27,10 @@ on:
 
 jobs:
   comment:
-    name: Comment released PRs
+    name: Comment on released PRs
     runs-on: ubuntu-latest
     steps:
-      - name: Comment released PRs
+      - name: Comment on released PRs
         uses: rdlf0/comment-released-prs-action@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}

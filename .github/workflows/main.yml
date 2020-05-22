@@ -15,7 +15,7 @@ jobs:
       #   with:
       #     path: "comment-released-prs-action"
 
-      - name: Comment PRs
+      - name: Comment on PRs
         uses: rdlf0/comment-released-prs-action@v1
         # uses: ./
         with:
