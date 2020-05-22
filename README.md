@@ -35,7 +35,9 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
-The posted comment will look like this:  
+
+## Posted comment
+The comment posted to the PRs will look like this:  
 ![comment-preview](https://github.com/rdlf0/comment-released-prs-action/blob/master/assets/comment-preview.png)
 
 ## License
