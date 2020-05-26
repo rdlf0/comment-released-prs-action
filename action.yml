@@ -1,5 +1,5 @@
-name: "Comment the Released PRs"
-description: "Walks through all PRs in a release and adds a comment about the release"
+name: "Comment on the released PRs"
+description: "Walks through all the PRs in a release and adds comments about that release"
 author: "Radoslav Stoyanov <r.stoyanov@outlook.com>"
 inputs: 
   repo-token:
