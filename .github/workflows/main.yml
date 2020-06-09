@@ -16,7 +16,7 @@ jobs:
       #     path: "comment-released-prs-action"
 
       - name: Comment on PRs
-        uses: rdlf0/comment-released-prs-action@v1
+        uses: rdlf0/comment-released-prs-action@v2
         # uses: ./
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
