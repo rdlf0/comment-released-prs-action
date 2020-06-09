@@ -13,7 +13,7 @@ Place to set your own custom text for the posted comment. If omitted, the defaul
 List of the IDs of the commented PRs
 
 ## Available release properties
-Here is a list of the properties of the release that triggered the action which can be used in the custom comment body text via placeholders:
+Here is a list of the release properties which can be used in the custom comment body text via placeholders:
 | Property | Note |
 | -------- | ---- |
 | `id` |  |
