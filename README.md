@@ -1,17 +1,43 @@
 # GitHub Action - Adds release comments to PRs
-This action iterates through all PRs that are part of a release and adds a comment to each of them containing information about the release.
+This action iterates through all PRs that are part of a release and adds a comment to each of them.
 
 ## Inputs
 ### `repo-token`
-**Required** The GITHUB_TOKEN secret.
+**Required** The `GITHUB_TOKEN` secret.
 
 ### `comment-body`
-Place to set your own custom text for the posted comment.  
-@TODO: needs better description and list of the possible release properties
+Place to set your own custom text for the posted comment. If omitted, the default message show in the [image below](https://github.com/rdlf0/comment-released-prs-action#posted-comment) will be used. Supports markdown syntax and emojis (see [example](https://github.com/rdlf0/comment-released-prs-action#example-usage)). The text can contain properties of the release in the form of `{{propertyName}}`. Full list of available properties can be found in the [table below](https://github.com/rdlf0/comment-released-prs-action#available-release-properties).
 
 ## Outputs
 ### `pr-ids`
 List of the IDs of the commented PRs
+
+## Available release properties
+Here is a list of the properties of the release that triggered the action which can be used in the custom comment body text via placeholders:
+| Property | Note |
+| -------- | ---- |
+| `id` |  |
+| `name` |  |
+| `tag_name` |  |
+| `url` |  |
+| `html_url` |  |
+| `assets_url` |  |
+| `upload_url` |  |
+| `tarball_url` |  |
+| `zipball_url` |  |
+| `body` |  |
+| `node_id` |  |
+| `target_commitish` |  |
+| `created_at` | Timestamp in `ISO 8601` format. For example: `2020-05-08T21:25:54Z` |
+| `published_at` | Timestamp in `ISO 8601` format. For example: `2020-05-08T21:25:54Z` |
+| `draft` | boolean value; prints `true` or `false` |
+| `prerelease` | boolean value; prints `true` or `false` |
+| `author.id` |  |
+| `author.login` | author's username |
+| `author.avatar_url` |  |
+| `author.gravatar_id` |  |
+| `author.html_url` |  |
+| `author.organizations_url` |  |
 
 ## Example usage
 This action runs only when triggered by a `release` event and a `published` action.
@@ -32,6 +58,7 @@ jobs:
         uses: rdlf0/comment-released-prs-action@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-body: "🙌 This is some sample custom message. 🤣 It supports markdown and emojis! 🎈 You can show information about the release that triggered the action - [{{name}}]({{html_url}}) 💩\r\nOr you can show off with a list:\r\n- Which includes some nonsense\r\n- Or other useless info\r\n- And so on...\r\n\r\nInfo about the author of the release is also available:\r\n![{{author.login}}]({{author.avatar_url}})"
 ```
 
 ## Posted comment
