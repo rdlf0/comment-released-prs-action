@@ -1,10 +1,8 @@
 import * as core from "@actions/core"
 import * as github from "@actions/github"
 import { Octokit } from "@octokit/rest"
-import {
-    WebhookPayloadRelease,
-    WebhookPayloadReleaseRelease,
-} from "@octokit/webhooks"
+import { WebhookPayloadRelease } from "@octokit/webhooks"
+import { BodyProcessor } from "./bodyProcessor";
 
 async function run(): Promise<void> {
     try {
@@ -38,7 +36,10 @@ async function run(): Promise<void> {
             currentRelease.tag_name,
         );
 
-        await addCommentsToPRs(octokit, prsByNumber, currentRelease);
+        const commentBody = core.getInput("comment-body");
+        const processedBody = BodyProcessor.process(commentBody, currentRelease);
+
+        await addCommentsToPRs(octokit, prsByNumber, processedBody);
 
         core.setOutput("pr-ids", Array.from(prsByNumber.keys()));
     } catch (error) {
@@ -112,14 +113,14 @@ async function getReleasedPRs(
 async function addCommentsToPRs(
     client: github.GitHub,
     prs: Map<number, Octokit.ReposListPullRequestsAssociatedWithCommitResponseItem>,
-    release: WebhookPayloadReleaseRelease,
+    body: string
 ): Promise<void> {
 
     prs.forEach(async pr => {
         const responseComment = await client.issues.createComment({
             ...github.context.repo,
             issue_number: pr.number,
-            body: `\u{1F389} Hooray! The changes in this pull request went live with the release of [${release.name}](${release.html_url}) \u{1F389}`,
+            body: body,
         });
 
         core.debug(`Commented PR: ${pr.number}, resposne code: ${responseComment.status.toString()}`);

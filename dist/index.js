@@ -36,8 +36,6 @@ module.exports =
 /******/ 		// Load entry module and return exports
 /******/ 		return __webpack_require__(669);
 /******/ 	};
-/******/ 	// initialize runtime
-/******/ 	runtime(__webpack_require__);
 /******/
 /******/ 	// run startup
 /******/ 	return startup();
@@ -19935,50 +19933,57 @@ module.exports = class HttpError extends Error {
 /***/ }),
 
 /***/ 669:
-/***/ (function(__unusedmodule, __webpack_exports__, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(369);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(765);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
 
-
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(369));
+const github = __importStar(__webpack_require__(765));
+const bodyProcessor_1 = __webpack_require__(999);
 async function run() {
     var _a;
     try {
-        const payload = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload;
-        const event = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.eventName;
+        const payload = github.context.payload;
+        const event = github.context.eventName;
         const action = payload.action;
         if (event != "release" || action != "published") {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(`This action is meant to run only when a release is being published. Current event='${event}'; current action='${action}'`);
+            core.error(`This action is meant to run only when a release is being published. Current event="${event}"; Current action="${action}"`);
             return;
         }
-        const token = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('repo-token', { required: true });
-        const octokit = new _actions_github__WEBPACK_IMPORTED_MODULE_1__.GitHub(token);
+        const token = core.getInput("repo-token", { required: true });
+        const octokit = new github.GitHub(token);
         const currentRelease = payload.release;
-        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Current release tag=${currentRelease.tag_name}`);
+        core.debug(`Current release tag=${currentRelease.tag_name}`);
         const previousRelease = await getPreviousRelease(octokit);
         if (previousRelease) {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Previous release tag=${previousRelease.tag_name}`);
+            core.debug(`Previous release tag=${previousRelease.tag_name}`);
         }
         else {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("Previous release not found.");
+            core.debug("Previous release not found.");
         }
-        const prsById = await getReleasedPRs(octokit, (_a = previousRelease) === null || _a === void 0 ? void 0 : _a.tag_name, currentRelease.tag_name);
-        await addCommentsToPRs(octokit, prsById, currentRelease);
-        _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("pr-ids", Array.from(prsById.keys()));
+        const prsByNumber = await getReleasedPRs(octokit, (_a = previousRelease) === null || _a === void 0 ? void 0 : _a.tag_name, currentRelease.tag_name);
+        const commentBody = core.getInput("comment-body");
+        const processedBody = bodyProcessor_1.BodyProcessor.process(commentBody, currentRelease);
+        await addCommentsToPRs(octokit, prsByNumber, processedBody);
+        core.setOutput("pr-ids", Array.from(prsByNumber.keys()));
     }
     catch (error) {
-        _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
+        core.setFailed(error.message);
     }
 }
 async function getPreviousRelease(client) {
     const { data: releases } = await client.repos.listReleases({
-        ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
+        ...github.context.repo,
         per_page: 2,
-        page: 1
+        page: 1,
     });
     if (releases.length < 2) {
         return undefined;
@@ -19989,42 +19994,43 @@ async function getReleasedPRs(client, base, head) {
     let commits;
     if (base == undefined) {
         const responseCommits = await client.repos.listCommits({
-            ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
+            ...github.context.repo,
             sha: head,
-            per_page: 50
+            per_page: 50,
+            page: 1,
         });
         commits = responseCommits.data;
-        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Found ${commits.length} commits when listed from head=${head}`);
+        core.debug(`Found ${commits.length} commits when listed from head=${head}`);
     }
     else {
         const responseCommits = await client.repos.compareCommits({
-            ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
+            ...github.context.repo,
             base: base,
-            head: head
+            head: head,
         });
         commits = responseCommits.data.commits;
-        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Found ${commits.length} commits when compared base=${base} and head=${head}`);
+        core.debug(`Found ${commits.length} commits when compared base=${base} and head=${head}`);
     }
-    let prsById = new Map();
+    const prsByNumber = new Map();
     for (const commit of commits) {
         const { data: prs } = await client.repos.listPullRequestsAssociatedWithCommit({
-            ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
-            commit_sha: commit.sha
+            ...github.context.repo,
+            commit_sha: commit.sha,
         });
         prs.forEach(pr => {
-            prsById.set(pr.number, pr);
+            prsByNumber.set(pr.number, pr);
         });
     }
-    return prsById;
+    return prsByNumber;
 }
-async function addCommentsToPRs(client, prs, release) {
+async function addCommentsToPRs(client, prs, body) {
     prs.forEach(async (pr) => {
         const responseComment = await client.issues.createComment({
-            ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
+            ...github.context.repo,
             issue_number: pr.number,
-            body: `\u{1F389} Hooray! The changes in this pull request went live with the release of [${release.name}](${release.html_url}) \u{1F389}`,
+            body: body,
         });
-        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Commented PR: ${pr.number}, resposne code: ${responseComment.status.toString()}`);
+        core.debug(`Commented PR: ${pr.number}, resposne code: ${responseComment.status.toString()}`);
     });
 }
 run();
@@ -24212,26 +24218,6 @@ function getValue(object, key) {
   return object == null ? undefined : object[key];
 }
 
-/** Used for built-in method references. */
-var arrayProto = Array.prototype,
-    funcProto = Function.prototype,
-    objectProto = Object.prototype;
-
-/** Used to detect overreaching core-js shims. */
-var coreJsData = root['__core-js_shared__'];
-
-/** Used to detect methods masquerading as native. */
-var maskSrcKey = (function() {
-  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
-  return uid ? ('Symbol(src)_1.' + uid) : '';
-}());
-
-/** Used to resolve the decompiled source of functions. */
-var funcToString = funcProto.toString;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
 /**
  * Checks if `value` is a host object in IE < 9.
  *
@@ -25029,7 +25015,6 @@ function httpOverHttp(options) {
   agent.request = http.request;
   return agent;
 }
-util.inherits(TunnelingAgent, events.EventEmitter);
 
 function httpsOverHttp(options) {
   var agent = new TunnelingAgent(options);
@@ -25464,45 +25449,60 @@ exports.paginateRest = paginateRest;
 //# sourceMappingURL=index.js.map
 
 
+/***/ }),
+
+/***/ 999:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const DEFAULT_BODY = "🎉 Hooray! The changes in this pull request went live with the release of [{{name}}]({{html_url}}) 🎉";
+const PLACEHOLDERS = [
+    "id",
+    "name",
+    "tag_name",
+    "url",
+    "html_url",
+    "assets_url",
+    "upload_url",
+    "tarball_url",
+    "zipball_url",
+    "body",
+    "node_id",
+    "target_commitish",
+    "created_at",
+    "published_at",
+    "draft",
+    "prerelease",
+    "author.avatar_url",
+    "author.gravatar_id",
+    "author.html_url",
+    "author.id",
+    "author.login",
+    "author.organizations_url",
+];
+class BodyProcessor {
+    static process(input, release) {
+        if (input == undefined || input.length == 0) {
+            input = DEFAULT_BODY;
+        }
+        return input.replace(/{{(\w+(?:\.\w+)*)}}/g, (match, prop) => {
+            if (!PLACEHOLDERS.includes(prop)) {
+                return match;
+            }
+            const parts = prop.split(".");
+            let base = release;
+            for (let i = 0; i < parts.length - 1; i++) {
+                base = base[parts[i]];
+            }
+            return base[parts[parts.length - 1]];
+        });
+    }
+}
+exports.BodyProcessor = BodyProcessor;
+
+
 /***/ })
 
-/******/ },
-/******/ function(__webpack_require__) { // webpackRuntimeModules
-/******/ 	"use strict";
-/******/ 
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	!function() {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = function(exports) {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	}();
-/******/ 	
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	!function() {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = function(module) {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				function getDefault() { return module['default']; } :
-/******/ 				function getModuleExports() { return module; };
-/******/ 			__webpack_require__.d(getter, 'a', getter);
-/******/ 			return getter;
-/******/ 		};
-/******/ 	}();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getter */
-/******/ 	!function() {
-/******/ 		// define getter function for harmony exports
-/******/ 		var hasOwnProperty = Object.prototype.hasOwnProperty;
-/******/ 		__webpack_require__.d = function(exports, name, getter) {
-/******/ 			if(!hasOwnProperty.call(exports, name)) {
-/******/ 				Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 			}
-/******/ 		};
-/******/ 	}();
-/******/ 	
-/******/ }
-);
+/******/ });

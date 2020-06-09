@@ -5,6 +5,9 @@ inputs:
   repo-token:
     description: "The GITHUB_TOKEN secret"
     required: true
+  comment-body:
+    description: "Custom text for the generated comment"
+    required: false
 outputs:
   pr-ids:
     description: "IDs of the PRs that were commented"
