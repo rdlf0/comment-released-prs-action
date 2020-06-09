@@ -1,7 +1,4 @@
-import {
-    WebhookPayloadReleaseRelease,
-    WebhookPayloadReleaseReleaseAuthor,
-} from "@octokit/webhooks";
+import { WebhookPayloadReleaseRelease } from "@octokit/webhooks";
 
 const DEFAULT_BODY = "🎉 Hooray! The changes in this pull request went live with the release of [{{name}}]({{html_url}}) 🎉"
 const PLACEHOLDERS = [
@@ -45,11 +42,12 @@ export class BodyProcessor {
             }
 
             const parts = prop.split(".");
-            if (parts.length == 2) {
-                return release["author"][parts[1] as keyof WebhookPayloadReleaseReleaseAuthor] as string;
+            let base: any = release;
+            for (let i = 0; i < parts.length - 1; i++) {
+                base = base[parts[i]];
             }
 
-            return release[parts[0] as keyof WebhookPayloadReleaseRelease] as string;
+            return base[parts[parts.length - 1]];
         });
     }
 

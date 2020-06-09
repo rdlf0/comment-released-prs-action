@@ -35,10 +35,11 @@ class BodyProcessor {
                 return match;
             }
             const parts = prop.split(".");
-            if (parts.length == 2) {
-                return release["author"][parts[1]];
+            let base = release;
+            for (let i = 0; i < parts.length - 1; i++) {
+                base = base[parts[i]];
             }
-            return release[parts[0]];
+            return base[parts[parts.length - 1]];
         });
     }
 }
