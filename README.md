@@ -13,7 +13,7 @@ Refer [here](https://github.com/rdlf0/comment-released-prs-action/blob/v1/README
 **Required** The `GITHUB_TOKEN` secret.
 
 ### `comment-body`
-Place to set your own custom text for the posted comment. If omitted, the default message shown in the [image below](#posted-comment) will be used. Supports markdown syntax and emojis (see [example](#example-usage)). The text can contain properties of the release in the form of `{{propertyName}}`. Full list of available properties can be found in the [table below](#available-release-properties).
+Place to set your own custom text for the posted comment. If omitted, the default message shown in the [image below](#posted-comment) will be used. Supports markdown syntax and emojis (see [example](#example-workflow)). The text can contain properties of the release in the form of `{{propertyName}}`. Full list of available properties can be found in the [table below](#available-release-properties).
 
 ## Outputs
 ### `pr-ids`
