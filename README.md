@@ -1,12 +1,19 @@
-# GitHub Action - Adds release comments to PRs
+# GitHub Action - Adds release comments to PRs v2
 This action iterates through all PRs that are part of a release and adds a comment to each of them. It runs only when triggered by a `release` event and a `published` action.
 
+# What's new
+- Added a new input parameter for specifying custom body text for the posted comment
+- Improved documentation
+
+Refer [here](https://github.com/rdlf0/comment-released-prs-action/blob/v1/README.md) for previous versions.
+
+# Usage
 ## Inputs
 ### `repo-token`
 **Required** The `GITHUB_TOKEN` secret.
 
 ### `comment-body`
-Place to set your own custom text for the posted comment. If omitted, the default message shown in the [image below](https://github.com/rdlf0/comment-released-prs-action#posted-comment) will be used. Supports markdown syntax and emojis (see [example](https://github.com/rdlf0/comment-released-prs-action#example-usage)). The text can contain properties of the release in the form of `{{propertyName}}`. Full list of available properties can be found in the [table below](https://github.com/rdlf0/comment-released-prs-action#available-release-properties).
+Place to set your own custom text for the posted comment. If omitted, the default message shown in the [image below](#posted-comment) will be used. Supports markdown syntax and emojis (see [example](#example-workflow)). The text can contain properties of the release in the form of `{{propertyName}}`. Full list of available properties can be found in the [table below](#available-release-properties).
 
 ## Outputs
 ### `pr-ids`
@@ -39,7 +46,7 @@ Here is a list of the release properties which can be used in the custom comment
 | `author.html_url` |  |
 | `author.organizations_url` |  |
 
-## Example usage
+## Example workflow
 ```yml
 name: Comment on released PRs
 
@@ -61,8 +68,8 @@ jobs:
 ```
 
 ## Posted comment
-The default comment (if `comment-body` is not set) posted to the PRs will look like this:  
+The default comment (if `comment-body` parameter is not set) posted to the PRs will look like this:  
 ![comment-preview](https://github.com/rdlf0/comment-released-prs-action/blob/master/assets/comment-preview.png)
 
-## License
+# License
 The scripts and documentation in this project are released under the [MIT License](https://github.com/rdlf0/comment-released-prs-action/blob/master/LICENSE)
