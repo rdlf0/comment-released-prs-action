@@ -20,7 +20,7 @@
     "license": "MIT",
     "main": "dist/index.js",
     "dependencies": {
-        "@actions/core": "^1.2.4",
+        "@actions/core": "^1.2.6",
         "@actions/github": "^2.2.0",
         "@octokit/webhooks": "^7.5.0"
     },
