@@ -1,5 +1,5 @@
 # The compiled Typescript source
-src/index.js
+src/**/*.js
 
 # Logs
 logs
