@@ -1,4 +1,4 @@
-import { WebhookPayloadReleaseRelease } from "@octokit/webhooks";
+import { EmitterWebhookEvent } from "@octokit/webhooks";
 
 const DEFAULT_BODY = "🎉 Hooray! The changes in this pull request went live with the release of [{{name}}]({{html_url}}) 🎉"
 const PLACEHOLDERS = [
@@ -30,7 +30,7 @@ export class BodyProcessor {
 
     public static process(
         input: string,
-        release: WebhookPayloadReleaseRelease,
+        release: EmitterWebhookEvent<"release">["payload"]["release"],
     ): string {
         if (input == undefined || input.length == 0) {
             input = DEFAULT_BODY;
