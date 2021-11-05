@@ -9,6 +9,8 @@ type ResponseTypes = components["schemas"];
 
 async function run(): Promise<void> {
     try {
+        core.debug("A temporary log for testing");
+
         const payload = github.context.payload as EmitterWebhookEvent<"release.published">["payload"];
         const event = github.context.eventName;
         const action = payload.action;

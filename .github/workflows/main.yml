@@ -10,14 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     name: A testing job
     steps:
-      # - name: Checkout
-      #   uses: actions/checkout@v2
-      #   with:
-      #     path: "comment-released-prs-action"
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: "comment-released-prs-action"
 
       - name: Comment on PRs
-        uses: rdlf0/comment-released-prs-action@v2
-        # uses: ./
+        # uses: rdlf0/comment-released-prs-action@v2
+        uses: ./
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          comment-body: "🙌 This is some sample custom message. 🤣 It supports markdown and emojis! 🎈 You can show information about the release that triggered the action - [{{name}}]({{html_url}}) 💩\r\nOr you can show off with a list:\r\n- Which includes some nonsense\r\n- Or other useless info\r\n- And so on...\r\n\r\nInfo about the author of the release is also available:\r\n![{{author.login}}]({{author.avatar_url}})"
