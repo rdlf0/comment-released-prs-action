@@ -1,12 +1,15 @@
-import * as core from "@actions/core"
-import * as github from "@actions/github"
-import { Octokit } from "@octokit/rest"
-import { WebhookPayloadRelease } from "@octokit/webhooks"
+import * as core from "@actions/core";
+import * as github from "@actions/github";
+import { EmitterWebhookEvent } from "@octokit/webhooks";
+import { components } from "@octokit/openapi-types";
 import { BodyProcessor } from "./bodyProcessor";
+
+type ClientType = ReturnType<typeof github.getOctokit>;
+type ResponseSchemas = components["schemas"];
 
 async function run(): Promise<void> {
     try {
-        const payload = github.context.payload as WebhookPayloadRelease;
+        const payload = github.context.payload as EmitterWebhookEvent<"release.published">["payload"];
         const event = github.context.eventName;
         const action = payload.action;
 
@@ -18,7 +21,7 @@ async function run(): Promise<void> {
         }
 
         const token = core.getInput("repo-token", { required: true });
-        const octokit = new github.GitHub(token);
+        const octokit: ClientType = github.getOctokit(token);
 
         const currentRelease = payload.release;
         core.debug(`Current release tag=${currentRelease.tag_name}`);
@@ -38,22 +41,22 @@ async function run(): Promise<void> {
 
         const commentBody = core.getInput("comment-body");
         const processedBody = BodyProcessor.process(commentBody, currentRelease);
-
         await addCommentsToPRs(octokit, prsByNumber, processedBody);
 
         core.setOutput("pr-ids", Array.from(prsByNumber.keys()));
-    } catch (error) {
-        core.setFailed(error.message)
+    } catch (error: any) {
+        core.error(error);
+        core.setFailed(error.message);
     }
 }
 
 async function getPreviousRelease(
-    client: github.GitHub,
-): Promise<Octokit.ReposListReleasesResponseItem | undefined> {
+    client: ClientType,
+): Promise<ResponseSchemas["release"] | undefined> {
 
     const {
         data: releases
-    } = await client.repos.listReleases({
+    } = await client.rest.repos.listReleases({
         ...github.context.repo,
         per_page: 2,
         page: 1,
@@ -67,15 +70,15 @@ async function getPreviousRelease(
 }
 
 async function getReleasedPRs(
-    client: github.GitHub,
+    client: ClientType,
     base: string | undefined,
     head: string,
-): Promise<Map<number, Octokit.ReposListPullRequestsAssociatedWithCommitResponseItem>> {
+): Promise<Map<number, ResponseSchemas["pull-request-simple"]>> {
 
     let commits;
 
     if (base == undefined) {
-        const responseCommits = await client.repos.listCommits({
+        const responseCommits = await client.rest.repos.listCommits({
             ...github.context.repo,
             sha: head,
             per_page: 50,
@@ -85,7 +88,7 @@ async function getReleasedPRs(
         commits = responseCommits.data;
         core.debug(`Found ${commits.length} commits when listed from head=${head}`);
     } else {
-        const responseCommits = await client.repos.compareCommits({
+        const responseCommits = await client.rest.repos.compareCommits({
             ...github.context.repo,
             base: base,
             head: head,
@@ -95,9 +98,9 @@ async function getReleasedPRs(
         core.debug(`Found ${commits.length} commits when compared base=${base} and head=${head}`);
     }
 
-    const prsByNumber: Map<number, Octokit.ReposListPullRequestsAssociatedWithCommitResponseItem> = new Map();
+    const prsByNumber: Map<number, ResponseSchemas["pull-request-simple"]> = new Map();
     for (const commit of commits) {
-        const { data: prs } = await client.repos.listPullRequestsAssociatedWithCommit({
+        const { data: prs } = await client.rest.repos.listPullRequestsAssociatedWithCommit({
             ...github.context.repo,
             commit_sha: commit.sha,
         });
@@ -111,13 +114,13 @@ async function getReleasedPRs(
 }
 
 async function addCommentsToPRs(
-    client: github.GitHub,
-    prs: Map<number, Octokit.ReposListPullRequestsAssociatedWithCommitResponseItem>,
+    client: ClientType,
+    prs: Map<number, ResponseSchemas["pull-request-simple"]>,
     body: string
 ): Promise<void> {
 
     prs.forEach(async pr => {
-        const responseComment = await client.issues.createComment({
+        const responseComment = await client.rest.issues.createComment({
             ...github.context.repo,
             issue_number: pr.number,
             body: body,
