@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     name: A testing job
     steps:
-      # - name: Checkout
-      #   uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@2
 
       - name: Comment on PRs
-        uses: rdlf0/comment-released-prs-action@v2
-        # uses: ./
+        # uses: rdlf0/comment-released-prs-action@v2
+        uses: ./
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           comment-body: "🎉 Hooray! 🎊 This is now part of [{{name}}]({{html_url}}) ✨"
