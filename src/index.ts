@@ -5,12 +5,10 @@ import { components } from "@octokit/openapi-types";
 import { BodyProcessor } from "./bodyProcessor";
 
 type ClientType = ReturnType<typeof github.getOctokit>;
-type ResponseTypes = components["schemas"];
+type ResponseSchemas = components["schemas"];
 
 async function run(): Promise<void> {
     try {
-        core.debug("A temporary log for testing");
-
         const payload = github.context.payload as EmitterWebhookEvent<"release.published">["payload"];
         const event = github.context.eventName;
         const action = payload.action;
@@ -54,7 +52,7 @@ async function run(): Promise<void> {
 
 async function getPreviousRelease(
     client: ClientType,
-): Promise<ResponseTypes["release"] | undefined> {
+): Promise<ResponseSchemas["release"] | undefined> {
 
     const {
         data: releases
@@ -75,7 +73,7 @@ async function getReleasedPRs(
     client: ClientType,
     base: string | undefined,
     head: string,
-): Promise<Map<number, ResponseTypes["pull-request-simple"]>> {
+): Promise<Map<number, ResponseSchemas["pull-request-simple"]>> {
 
     let commits;
 
@@ -100,7 +98,7 @@ async function getReleasedPRs(
         core.debug(`Found ${commits.length} commits when compared base=${base} and head=${head}`);
     }
 
-    const prsByNumber: Map<number, ResponseTypes["pull-request-simple"]> = new Map();
+    const prsByNumber: Map<number, ResponseSchemas["pull-request-simple"]> = new Map();
     for (const commit of commits) {
         const { data: prs } = await client.rest.repos.listPullRequestsAssociatedWithCommit({
             ...github.context.repo,
@@ -117,7 +115,7 @@ async function getReleasedPRs(
 
 async function addCommentsToPRs(
     client: ClientType,
-    prs: Map<number, ResponseTypes["pull-request-simple"]>,
+    prs: Map<number, ResponseSchemas["pull-request-simple"]>,
     body: string
 ): Promise<void> {
 
