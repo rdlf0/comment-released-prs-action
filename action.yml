@@ -8,6 +8,14 @@ inputs:
   comment-body:
     description: "Custom text for the generated comment"
     required: false
+  add-label:
+    description: "Whether a label should be added to the PR or not"
+    required: false
+    default: "false"
+  label-pattern:
+    description: "Custom pattern for the label"
+    required: false
+    default: "release-{{tag_name}}"
 outputs:
   pr-ids:
     description: "IDs of the PRs that were commented"
