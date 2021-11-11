@@ -15,7 +15,7 @@ inputs:
   label-pattern:
     description: "Custom pattern for the label"
     required: false
-    default: "release-{{tag_name}}"
+    default: "release-{{name}}"
 outputs:
   pr-ids:
     description: "IDs of the PRs that were commented"

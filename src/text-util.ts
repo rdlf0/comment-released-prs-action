@@ -1,6 +1,7 @@
 import { EmitterWebhookEvent } from "@octokit/webhooks";
 
-const DEFAULT_BODY = "🎉 Hooray! The changes in this pull request went live with the release of [{{name}}]({{html_url}}) 🎉"
+const DEFAULT_COMMENT_BODY = "🎉 Hooray! The changes in this pull request went live with the release of [{{name}}]({{html_url}}) 🎉";
+const DEFAULT_LABEL_NAME = "release-{{name}}";
 const PLACEHOLDERS = [
     "id",
     "name",
@@ -26,14 +27,29 @@ const PLACEHOLDERS = [
     "author.organizations_url",
 ];
 
-export class BodyProcessor {
+export class TextUtil {
 
-    public static process(
+    public static formatComment(
+        input: string,
+        release: EmitterWebhookEvent<"release">["payload"]["release"]
+    ): string {
+        return this.format(input, release, DEFAULT_COMMENT_BODY);
+    }
+
+    public static formatLabel(
+        input: string,
+        release: EmitterWebhookEvent<"release">["payload"]["release"]
+    ): string {
+        return this.format(input, release, DEFAULT_LABEL_NAME);
+    }
+
+    private static format(
         input: string,
         release: EmitterWebhookEvent<"release">["payload"]["release"],
+        defaultString: string
     ): string {
         if (input == undefined || input.length == 0) {
-            input = DEFAULT_BODY;
+            input = defaultString;
         }
 
         return input.replace(/{{(\w+(?:\.\w+)*)}}/g, (match, prop) => {

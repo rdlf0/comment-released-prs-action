@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
 import { components } from "@octokit/openapi-types";
-import { BodyProcessor } from "./bodyProcessor";
+import { TextUtil } from "./text-util";
 
 type ClientType = ReturnType<typeof github.getOctokit>;
 type ResponseSchemas = components["schemas"];
@@ -40,8 +40,15 @@ async function run(): Promise<void> {
         );
 
         const commentBody = core.getInput("comment-body");
-        const processedBody = BodyProcessor.process(commentBody, currentRelease);
-        await addCommentsToPRs(octokit, prsByNumber, processedBody);
+        const formattedBody = TextUtil.formatComment(commentBody, currentRelease);
+        await addCommentsToPRs(octokit, prsByNumber, formattedBody);
+
+        const shouldAddLabel = core.getBooleanInput("add-label");
+        if (shouldAddLabel) {
+            const labelPattern = core.getInput("label-pattern");
+            const formattedLabel = TextUtil.formatLabel(labelPattern, currentRelease);
+            await addLabelToPRs(octokit, prsByNumber, formattedLabel)
+        }
 
         core.setOutput("pr-ids", Array.from(prsByNumber.keys()));
     } catch (error: any) {
@@ -120,14 +127,31 @@ async function addCommentsToPRs(
 ): Promise<void> {
 
     prs.forEach(async pr => {
-        const responseComment = await client.rest.issues.createComment({
+        const response = await client.rest.issues.createComment({
             ...github.context.repo,
             issue_number: pr.number,
             body: body,
         });
 
-        core.debug(`Commented PR: ${pr.number}, resposne code: ${responseComment.status.toString()}`);
+        core.debug(`Commented PR: ${pr.number}, resposne code: ${response.status.toString()}`);
     });
+}
+
+async function addLabelToPRs(
+    client: ClientType,
+    prs: Map<number, ResponseSchemas["pull-request-simple"]>,
+    label: string
+): Promise<void> {
+    prs.forEach(async pr => {
+        const response = await client.rest.issues.addLabels({
+            ...github.context.repo,
+            issue_number: pr.number,
+            labels: [label]
+        });
+
+        core.debug(`Labeled PR: ${pr.number}, resposne code: ${response.status.toString()}`);
+    });
+
 }
 
 run()
