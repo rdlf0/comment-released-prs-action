@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
 import { components } from "@octokit/openapi-types";
 import { TextUtil } from "./text-util";
+import { Inputs, Outputs } from "./constants";
 
 type ClientType = ReturnType<typeof github.getOctokit>;
 type ResponseSchemas = components["schemas"];
@@ -20,7 +21,7 @@ async function run(): Promise<void> {
             return;
         }
 
-        const token = core.getInput("repo-token", { required: true });
+        const token = core.getInput(Inputs.RepoToken, { required: true });
         const octokit: ClientType = github.getOctokit(token);
 
         const currentRelease = payload.release;
@@ -39,25 +40,27 @@ async function run(): Promise<void> {
             currentRelease.tag_name,
         );
 
-        const commentBody = core.getInput("comment-body");
+        const commentBody = core.getInput(Inputs.CommentBody);
         const formattedBody = TextUtil.formatComment(commentBody, currentRelease);
         await addCommentsToPRs(octokit, prNumbers, formattedBody);
 
-        const shouldAddLabel = core.getBooleanInput("add-label");
+        const shouldAddLabel = core.getBooleanInput(Inputs.AddLabel);
         if (shouldAddLabel) {
-            const labelPattern = core.getInput("label-pattern");
+            const labelPattern = core.getInput(Inputs.LabelPattern);
             const formattedLabel = TextUtil.formatLabel(labelPattern, currentRelease);
             await addLabelToPRs(octokit, prNumbers, formattedLabel)
         }
 
-        core.setOutput("pr-ids", Array.from(prNumbers));
+        core.setOutput(Outputs.PRIDs, Array.from(prNumbers));
     } catch (error: any) {
         core.error(error);
         core.setFailed(error.message);
     }
 }
 
-async function getPreviousRelease(client: ClientType): Promise<ResponseSchemas["release"] | undefined> {
+async function getPreviousRelease(
+    client: ClientType
+): Promise<ResponseSchemas["release"] | undefined> {
     const {
         data: releases
     } = await client.rest.repos.listReleases({
@@ -76,7 +79,8 @@ async function getPreviousRelease(client: ClientType): Promise<ResponseSchemas["
 async function getReleasedPRNumbers(
     client: ClientType,
     base: string | undefined,
-    head: string): Promise<Set<number>> {
+    head: string
+): Promise<Set<number>> {
 
     let commits;
 
@@ -119,7 +123,8 @@ async function getReleasedPRNumbers(
 async function addCommentsToPRs(
     client: ClientType,
     prNumbers: Set<number>,
-    body: string): Promise<void> {
+    body: string
+): Promise<void> {
 
     prNumbers.forEach(async prNumber => {
         const response = await client.rest.issues.createComment({
@@ -135,7 +140,8 @@ async function addCommentsToPRs(
 async function addLabelToPRs(
     client: ClientType,
     prNumbers: Set<number>,
-    label: string): Promise<void> {
+    label: string
+): Promise<void> {
 
     prNumbers.forEach(async prNumber => {
         const response = await client.rest.issues.addLabels({

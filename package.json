@@ -1,19 +1,20 @@
 {
     "name": "comment-released-prs-action",
-    "version": "1.0.0",
-    "description": "A GitHub action that adds release comments to PRs",
+    "version": "3.0.0",
+    "description": "A GitHub action that adds release comments and labels to PRs",
     "author": "Radoslav Stoyanov <r.stoyanov@outlook.com>",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/rdlf0/comment-released-prs-action"
     },
     "scripts": {
-        "compile": "tsc && ncc build src/index.js"
+        "compile": "tsc && ncc build src/index.js -m --license licenses.txt"
     },
     "keywords": [
         "actions",
         "release",
         "comment",
+        "label",
         "node",
         "typescript"
     ],

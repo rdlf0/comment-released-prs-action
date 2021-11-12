@@ -14,8 +14,10 @@ jobs:
       #   uses: actions/checkout@v2
 
       - name: Comment on PRs
-        uses: rdlf0/comment-released-prs-action@v2
+        uses: rdlf0/comment-released-prs-action@v3
         # uses: ./
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           comment-body: "🎉 Hooray! 🎊 This is now part of [{{name}}]({{html_url}}) ✨"
+          add-label: true
+          label-pattern: "release-{{name}} 🐧"

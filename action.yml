@@ -1,5 +1,5 @@
 name: "Comment on the released PRs"
-description: "Walks through all the PRs in a release and adds comments about that release"
+description: "Walks through all the PRs in a release and adds a label and a comment about that release"
 author: "Radoslav Stoyanov <r.stoyanov@outlook.com>"
 inputs: 
   repo-token:
@@ -13,7 +13,7 @@ inputs:
     required: false
     default: "false"
   label-pattern:
-    description: "Custom pattern for the label"
+    description: "Custom pattern for the label name"
     required: false
     default: "release-{{name}}"
 outputs:
