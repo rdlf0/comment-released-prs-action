@@ -33,7 +33,7 @@ async function run(): Promise<void> {
             core.debug("Previous release not found.");
         }
 
-        const prsByNumber = await getReleasedPRs(
+        const prNumbers: Set<number> = await getReleasedPRNumbers(
             octokit,
             previousRelease?.tag_name,
             currentRelease.tag_name,
@@ -41,26 +41,23 @@ async function run(): Promise<void> {
 
         const commentBody = core.getInput("comment-body");
         const formattedBody = TextUtil.formatComment(commentBody, currentRelease);
-        await addCommentsToPRs(octokit, prsByNumber, formattedBody);
+        await addCommentsToPRs(octokit, prNumbers, formattedBody);
 
         const shouldAddLabel = core.getBooleanInput("add-label");
         if (shouldAddLabel) {
             const labelPattern = core.getInput("label-pattern");
             const formattedLabel = TextUtil.formatLabel(labelPattern, currentRelease);
-            await addLabelToPRs(octokit, prsByNumber, formattedLabel)
+            await addLabelToPRs(octokit, prNumbers, formattedLabel)
         }
 
-        core.setOutput("pr-ids", Array.from(prsByNumber.keys()));
+        core.setOutput("pr-ids", Array.from(prNumbers));
     } catch (error: any) {
         core.error(error);
         core.setFailed(error.message);
     }
 }
 
-async function getPreviousRelease(
-    client: ClientType,
-): Promise<ResponseSchemas["release"] | undefined> {
-
+async function getPreviousRelease(client: ClientType): Promise<ResponseSchemas["release"] | undefined> {
     const {
         data: releases
     } = await client.rest.repos.listReleases({
@@ -76,11 +73,10 @@ async function getPreviousRelease(
     return releases[1];
 }
 
-async function getReleasedPRs(
+async function getReleasedPRNumbers(
     client: ClientType,
     base: string | undefined,
-    head: string,
-): Promise<Map<number, ResponseSchemas["pull-request-simple"]>> {
+    head: string): Promise<Set<number>> {
 
     let commits;
 
@@ -105,7 +101,7 @@ async function getReleasedPRs(
         core.debug(`Found ${commits.length} commits when compared base=${base} and head=${head}`);
     }
 
-    const prsByNumber: Map<number, ResponseSchemas["pull-request-simple"]> = new Map();
+    const prNumbers: Set<number> = new Set();
     for (const commit of commits) {
         const { data: prs } = await client.rest.repos.listPullRequestsAssociatedWithCommit({
             ...github.context.repo,
@@ -113,45 +109,43 @@ async function getReleasedPRs(
         });
 
         prs.forEach(pr => {
-            prsByNumber.set(pr.number, pr);
+            prNumbers.add(pr.number);
         });
     }
 
-    return prsByNumber;
+    return prNumbers;
 }
 
 async function addCommentsToPRs(
     client: ClientType,
-    prs: Map<number, ResponseSchemas["pull-request-simple"]>,
-    body: string
-): Promise<void> {
+    prNumbers: Set<number>,
+    body: string): Promise<void> {
 
-    prs.forEach(async pr => {
+    prNumbers.forEach(async prNumber => {
         const response = await client.rest.issues.createComment({
             ...github.context.repo,
-            issue_number: pr.number,
+            issue_number: prNumber,
             body: body,
         });
 
-        core.debug(`Commented PR: ${pr.number}, resposne code: ${response.status.toString()}`);
+        core.debug(`Commented PR: ${prNumber}, resposne code: ${response.status.toString()}`);
     });
 }
 
 async function addLabelToPRs(
     client: ClientType,
-    prs: Map<number, ResponseSchemas["pull-request-simple"]>,
-    label: string
-): Promise<void> {
-    prs.forEach(async pr => {
+    prNumbers: Set<number>,
+    label: string): Promise<void> {
+
+    prNumbers.forEach(async prNumber => {
         const response = await client.rest.issues.addLabels({
             ...github.context.repo,
-            issue_number: pr.number,
+            issue_number: prNumber,
             labels: [label]
         });
 
-        core.debug(`Labeled PR: ${pr.number}, resposne code: ${response.status.toString()}`);
+        core.debug(`Labeled PR: ${prNumber}, resposne code: ${response.status.toString()}`);
     });
-
 }
 
 run()
