@@ -26,18 +26,18 @@ export class TextUtil {
             input = defaultString;
         }
 
-        return input.replace(/{{(\w+(?:\.\w+)*)}}/g, (match, prop) => {
+        return input.replace(/{{\s*(\w+(?:\.\w+)*)\s*}}/g, (match, prop) => {
             if (!RELEASE_PLACEHOLDERS.includes(prop)) {
                 return match;
             }
 
             const parts = prop.split(".");
-            let base: any = release;
-            for (let i = 0; i < parts.length - 1; i++) {
-                base = base[parts[i]];
+            let result: any = release;
+            for (const part of parts) {
+                result = result[part];
             }
 
-            return base[parts[parts.length - 1]];
+            return result;
         });
     }
 

@@ -41,8 +41,8 @@ async function run(): Promise<void> {
         );
 
         const commentBody = core.getInput(Inputs.CommentBody);
-        const formattedBody = TextUtil.formatComment(commentBody, currentRelease);
-        await addCommentsToPRs(octokit, prNumbers, formattedBody);
+        const formattedComment = TextUtil.formatComment(commentBody, currentRelease);
+        await addCommentsToPRs(octokit, prNumbers, formattedComment);
 
         const shouldAddLabel = core.getBooleanInput(Inputs.AddLabel);
         if (shouldAddLabel) {
