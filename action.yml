@@ -1,5 +1,5 @@
 name: "Comment on the released PRs"
-description: "Walks through all the PRs in a release and adds comments about that release"
+description: "Walks through all the PRs in a release and adds a label and a comment about that release"
 author: "Radoslav Stoyanov <r.stoyanov@outlook.com>"
 inputs: 
   repo-token:
@@ -8,6 +8,14 @@ inputs:
   comment-body:
     description: "Custom text for the generated comment"
     required: false
+  add-label:
+    description: "Whether a label should be added to the PR or not"
+    required: false
+    default: "false"
+  label-pattern:
+    description: "Custom pattern for the label name"
+    required: false
+    default: "release-{{name}}"
 outputs:
   pr-ids:
     description: "IDs of the PRs that were commented"
