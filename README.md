@@ -1,11 +1,11 @@
-# GitHub Action - Adds release comments to PRs v2
-This action iterates through all PRs that are part of a release and adds a comment to each of them. It runs only when triggered by a `release` event and a `published` action.
+# GitHub Action - Adds release comments and labels to PRs v3
+This action iterates through all PRs that are part of a release and adds a comment and a label to each of them. It runs only when triggered by a `release` event and a `published` action.
 
 # What's new
-- Added a new input parameter for specifying custom body text for the posted comment
+- Support for adding a label to the released PRs
 - Improved documentation
 
-Refer [here](https://github.com/rdlf0/comment-released-prs-action/blob/v1/README.md) for previous versions.
+Refer [here](https://github.com/rdlf0/comment-released-prs-action/blob/v2/README.md) for previous versions.
 
 # Usage
 ## Inputs
@@ -13,14 +13,20 @@ Refer [here](https://github.com/rdlf0/comment-released-prs-action/blob/v1/README
 **Required** The `GITHUB_TOKEN` secret.
 
 ### `comment-body`
-Place to set your own custom text for the posted comment. If omitted, the default message shown in the [image below](#posted-comment) will be used. Supports markdown syntax and emojis (see [example](#example-workflow)). The text can contain properties of the release in the form of `{{propertyName}}`. Full list of available properties can be found in the [table below](#available-release-properties).
+A place to set your own custom text for the posted comment. If omitted, the default message shown in the [image below](#posted-comment) will be used. Supports markdown, emojis and [placeholders](#placeholders-and-release-properties) (see [the example](#example-workflow)).
+
+### `add-label`
+A boolean value parameter, specifying if a label should also be added to the PR. The default value is `false`.
+
+### `label-pattern`
+A place to set your own label name. The value of this parameter is ignored if `add-label` is set to `false`. Supports emojis and [placeholders](#placeholders-and-release-properties). If ommited, the default value will be used - `release-{{name}}`.
 
 ## Outputs
 ### `pr-ids`
-List of the IDs of the commented PRs
+List of the IDs of the processed PRs.
 
-## Available release properties
-Here is a list of the release properties which can be used in the custom comment body text via placeholders:
+## Placeholders and release properties
+Some input parametrs can contain placeholders, which are references to properties of the release in the form of `{{property_name}}`. In the table below you can find a list of the available release properties which can be used via placeholders:
 | Property | Note |
 | -------- | ---- |
 | `id` |  |
@@ -35,8 +41,8 @@ Here is a list of the release properties which can be used in the custom comment
 | `body` |  |
 | `node_id` |  |
 | `target_commitish` |  |
-| `created_at` | Timestamp in `ISO 8601` format. For example: `2020-05-08T21:25:54Z` |
-| `published_at` | Timestamp in `ISO 8601` format. For example: `2020-05-08T21:25:54Z` |
+| `created_at` | Timestamp in `ISO 8601` format.<br />For example: `2020-05-08T21:25:54Z` |
+| `published_at` | Timestamp in `ISO 8601` format.<br />For example: `2020-05-08T21:25:54Z` |
 | `draft` | boolean value; prints `true` or `false` |
 | `prerelease` | boolean value; prints `true` or `false` |
 | `author.id` |  |
@@ -61,10 +67,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Comment on released PRs
-        uses: rdlf0/comment-released-prs-action@v2
+        uses: rdlf0/comment-released-prs-action@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          comment-body: "🙌 This is some sample custom message. 🤣 It supports markdown and emojis! 🎈 You can show information about the release that triggered the action - [{{name}}]({{html_url}}) 💩\r\nOr you can show off with a list:\r\n- Which includes some nonsense\r\n- Or other useless info\r\n- And so on...\r\n\r\nInfo about the author of the release is also available:\r\n![{{author.login}}]({{author.avatar_url}})"
+          comment-body: |-
+            🙌 This is some sample custom message. 🤣 It supports markdown and emojis! 🎈
+            You can show information about the release - [{{name}}]({{html_url}}) 💩
+            Or you can show off with a list:
+            - Which includes some nonsense
+            - Or other useless info
+            - And so on...
+
+            Info about the author of the release is also available:
+            ![{{author.login}}]({{author.avatar_url}})
+          add-label: true
+          label-pattern: "{{tag_name}} ✨"
 ```
 
 ## Posted comment
