@@ -126,7 +126,7 @@ async function addCommentsToPRs(
     body: string
 ): Promise<void> {
 
-    prNumbers.forEach(async prNumber => {
+    for (const prNumber of prNumbers) {
         const response = await client.rest.issues.createComment({
             ...github.context.repo,
             issue_number: prNumber,
@@ -134,7 +134,7 @@ async function addCommentsToPRs(
         });
 
         core.debug(`Commented PR: ${prNumber}, resposne code: ${response.status.toString()}`);
-    });
+    }
 }
 
 async function addLabelToPRs(
@@ -143,7 +143,7 @@ async function addLabelToPRs(
     label: string
 ): Promise<void> {
 
-    prNumbers.forEach(async prNumber => {
+    for (const prNumber of prNumbers) {
         const response = await client.rest.issues.addLabels({
             ...github.context.repo,
             issue_number: prNumber,
@@ -151,7 +151,7 @@ async function addLabelToPRs(
         });
 
         core.debug(`Labeled PR: ${prNumber}, resposne code: ${response.status.toString()}`);
-    });
+    }
 }
 
 run()
