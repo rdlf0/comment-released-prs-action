@@ -8,7 +8,8 @@
         "url": "git+https://github.com/rdlf0/comment-released-prs-action"
     },
     "scripts": {
-        "compile": "tsc && ncc build src/index.js -m --license licenses.txt"
+        "compile": "tsc && ncc build src/index.js -m --license licenses.txt",
+        "test": "node --import tsx --test \"src/**/*.test.ts\""
     },
     "keywords": [
         "actions",
@@ -19,15 +20,20 @@
         "typescript"
     ],
     "license": "MIT",
+    "type": "module",
     "main": "dist/index.js",
     "dependencies": {
-        "@actions/core": "^1.10.1",
-        "@actions/github": "^6.0.0",
-        "@octokit/webhooks": "^13.2.3",
-        "@types/node": "^20.12.7"
+        "@actions/core": "^3.0.1",
+        "@actions/github": "^9.1.1",
+        "@octokit/webhooks": "^14.2.0"
     },
     "devDependencies": {
-        "@vercel/ncc": "^0.38.1",
-        "typescript": "^5.4.5"
+        "@types/node": "^24.13.2",
+        "@vercel/ncc": "^0.44.0",
+        "tsx": "^4.22.4",
+        "typescript": "^6.0.3"
+    },
+    "allowScripts": {
+        "esbuild@0.28.0": true
     }
 }

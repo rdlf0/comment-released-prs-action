@@ -1,44 +1,31 @@
 import { EmitterWebhookEvent } from "@octokit/webhooks";
-import { RELEASE_PLACEHOLDERS, TextDefaults } from "./constants";
+import { RELEASE_PLACEHOLDERS, TextDefaults } from "./constants.js";
 
-export class TextUtil {
+type Release = EmitterWebhookEvent<"release">["payload"]["release"];
 
-    public static formatComment(
-        input: string,
-        release: EmitterWebhookEvent<"release">["payload"]["release"]
-    ): string {
-        return this.format(input, release, TextDefaults.CommentBody);
+export function formatComment(input: string, release: Release): string {
+    return format(input, release, TextDefaults.CommentBody);
+}
+
+export function formatLabel(input: string, release: Release): string {
+    return format(input, release, TextDefaults.LabelName);
+}
+
+function format(input: string, release: Release, defaultString: string): string {
+    if (!input) {
+        input = defaultString;
     }
 
-    public static formatLabel(
-        input: string,
-        release: EmitterWebhookEvent<"release">["payload"]["release"]
-    ): string {
-        return this.format(input, release, TextDefaults.LabelName);
-    }
-
-    private static format(
-        input: string,
-        release: EmitterWebhookEvent<"release">["payload"]["release"],
-        defaultString: string
-    ): string {
-        if (input == undefined || input.length == 0) {
-            input = defaultString;
+    return input.replace(/{{\s*(\w+(?:\.\w+)*)\s*}}/g, (match, prop) => {
+        if (!RELEASE_PLACEHOLDERS.includes(prop)) {
+            return match;
         }
 
-        return input.replace(/{{\s*(\w+(?:\.\w+)*)\s*}}/g, (match, prop) => {
-            if (!RELEASE_PLACEHOLDERS.includes(prop)) {
-                return match;
-            }
+        let result: any = release;
+        for (const part of prop.split(".")) {
+            result = result[part];
+        }
 
-            const parts = prop.split(".");
-            let result: any = release;
-            for (const part of parts) {
-                result = result[part];
-            }
-
-            return result;
-        });
-    }
-
+        return result;
+    });
 }

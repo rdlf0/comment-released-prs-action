@@ -20,7 +20,7 @@ outputs:
   pr-ids:
     description: "IDs of the PRs that were commented"
 runs:
-  using: "node20"
+  using: "node24"
   main: "dist/index.js"
 branding:
   icon: "message-square"
