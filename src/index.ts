@@ -2,8 +2,8 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
 import { components } from "@octokit/openapi-types";
-import { TextUtil } from "./text-util";
-import { Inputs, Outputs } from "./constants";
+import { TextUtil } from "./text-util.js";
+import { Inputs, Outputs } from "./constants.js";
 
 type ClientType = ReturnType<typeof github.getOctokit>;
 type ResponseSchemas = components["schemas"];

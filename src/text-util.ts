@@ -1,5 +1,5 @@
 import { EmitterWebhookEvent } from "@octokit/webhooks";
-import { RELEASE_PLACEHOLDERS, TextDefaults } from "./constants";
+import { RELEASE_PLACEHOLDERS, TextDefaults } from "./constants.js";
 
 export class TextUtil {
 
