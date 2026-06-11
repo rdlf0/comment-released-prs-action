@@ -153,7 +153,7 @@ async function addCommentsToPRs(
             body: body,
         });
 
-        core.debug(`Commented PR: ${prNumber}, resposne code: ${response.status.toString()}`);
+        core.debug(`Commented PR: ${prNumber}, response code: ${response.status.toString()}`);
     }
 }
 
@@ -170,7 +170,7 @@ async function addLabelToPRs(
             labels: [label]
         });
 
-        core.debug(`Labeled PR: ${prNumber}, resposne code: ${response.status.toString()}`);
+        core.debug(`Labeled PR: ${prNumber}, response code: ${response.status.toString()}`);
     }
 }
 
