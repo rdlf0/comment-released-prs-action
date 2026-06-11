@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
-import { TextUtil } from "./text-util.js";
+import { formatComment, formatLabel } from "./text-util.js";
 import { Inputs, Outputs } from "./constants.js";
 import {
     ClientType,
@@ -13,21 +13,21 @@ import {
 
 async function run(): Promise<void> {
     try {
-        const payload = github.context.payload as EmitterWebhookEvent<"release.published">["payload"];
-        const event = github.context.eventName;
-        const action = payload.action;
+        const { eventName, payload } = github.context;
 
-        if (event != "release" || action != "published") {
+        if (eventName !== "release" || payload.action !== "published") {
             core.error(
-                `This action is meant to run only when a release is being published. Current event="${event}"; Current action="${action}"`
+                `This action is meant to run only when a release is being published. Current event="${eventName}"; Current action="${payload.action}"`
             );
             return;
         }
 
+        // The guard above verified the event, so this assertion now reflects a checked fact.
+        const { release: currentRelease } = payload as EmitterWebhookEvent<"release.published">["payload"];
+
         const token = core.getInput(Inputs.RepoToken, { required: true });
         const octokit: ClientType = github.getOctokit(token);
 
-        const currentRelease = payload.release;
         core.debug(`Current release tag=${currentRelease.tag_name}`);
 
         const previousRelease = await getPreviousRelease(octokit, currentRelease);
@@ -44,20 +44,19 @@ async function run(): Promise<void> {
         );
 
         const commentBody = core.getInput(Inputs.CommentBody);
-        const formattedComment = TextUtil.formatComment(commentBody, currentRelease);
+        const formattedComment = formatComment(commentBody, currentRelease);
         await addCommentsToPRs(octokit, prNumbers, formattedComment);
 
         const shouldAddLabel = core.getBooleanInput(Inputs.AddLabel);
         if (shouldAddLabel) {
             const labelPattern = core.getInput(Inputs.LabelPattern);
-            const formattedLabel = TextUtil.formatLabel(labelPattern, currentRelease);
-            await addLabelToPRs(octokit, prNumbers, formattedLabel)
+            const formattedLabel = formatLabel(labelPattern, currentRelease);
+            await addLabelToPRs(octokit, prNumbers, formattedLabel);
         }
 
         core.setOutput(Outputs.PRIDs, Array.from(prNumbers));
-    } catch (error: any) {
-        core.error(error);
-        core.setFailed(error.message);
+    } catch (error: unknown) {
+        core.setFailed(error instanceof Error ? error.message : String(error));
     }
 }
 

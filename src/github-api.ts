@@ -49,9 +49,9 @@ export async function getReleasedPRNumbers(
     head: string
 ): Promise<Set<number>> {
 
-    let commits;
+    let commits: { sha: string }[];
 
-    if (base == undefined) {
+    if (base === undefined) {
         const responseCommits = await client.rest.repos.listCommits({
             ...github.context.repo,
             sha: head,
