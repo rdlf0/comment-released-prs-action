@@ -8,6 +8,13 @@ import { Inputs, Outputs } from "./constants.js";
 type ClientType = ReturnType<typeof github.getOctokit>;
 type ResponseSchemas = components["schemas"];
 
+// Upper bound on the commits inspected for the first-ever release (the path with no
+// previous release to diff against). Each commit triggers a separate
+// listPullRequestsAssociatedWithCommit request, so this caps API usage to stay well
+// within the GITHUB_TOKEN rate limit. Subsequent releases use compareCommits, which
+// is naturally bounded by the size of the release and not subject to this limit.
+const FIRST_RELEASE_COMMIT_LIMIT = 50;
+
 async function run(): Promise<void> {
     try {
         const payload = github.context.payload as EmitterWebhookEvent<"release.published">["payload"];
@@ -27,7 +34,7 @@ async function run(): Promise<void> {
         const currentRelease = payload.release;
         core.debug(`Current release tag=${currentRelease.tag_name}`);
 
-        const previousRelease = await getPreviousRelease(octokit);
+        const previousRelease = await getPreviousRelease(octokit, currentRelease);
         if (previousRelease) {
             core.debug(`Previous release tag=${previousRelease.tag_name}`);
         } else {
@@ -59,21 +66,34 @@ async function run(): Promise<void> {
 }
 
 async function getPreviousRelease(
-    client: ClientType
+    client: ClientType,
+    currentRelease: { id: number; created_at: string | null }
 ): Promise<ResponseSchemas["release"] | undefined> {
     const {
         data: releases
     } = await client.rest.repos.listReleases({
         ...github.context.repo,
-        per_page: 2,
+        per_page: 100,
         page: 1,
     });
 
-    if (releases.length < 2) {
-        return undefined;
-    }
+    // Find the most recent published (non-draft) release that precedes the current one.
+    // listReleases includes drafts and may not return them in a dependable order, so we
+    // filter out drafts and the current release, then pick the newest by creation date.
+    // A published release always has a creation date; fall back to "now" if it's somehow
+    // absent so that every prior release still qualifies as preceding it.
+    const currentCreatedAt = currentRelease.created_at
+        ? new Date(currentRelease.created_at).getTime()
+        : Date.now();
 
-    return releases[1];
+    return releases
+        .filter(release =>
+            !release.draft &&
+            release.id !== currentRelease.id &&
+            new Date(release.created_at).getTime() < currentCreatedAt
+        )
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .at(0);
 }
 
 async function getReleasedPRNumbers(
@@ -88,12 +108,12 @@ async function getReleasedPRNumbers(
         const responseCommits = await client.rest.repos.listCommits({
             ...github.context.repo,
             sha: head,
-            per_page: 50,
+            per_page: FIRST_RELEASE_COMMIT_LIMIT,
             page: 1,
         });
 
         commits = responseCommits.data;
-        core.debug(`Found ${commits.length} commits when listed from head=${head}`);
+        core.debug(`Found ${commits.length} commits when listed from head=${head} (capped at ${FIRST_RELEASE_COMMIT_LIMIT})`);
     } else {
         const responseCommits = await client.rest.repos.compareCommits({
             ...github.context.repo,
