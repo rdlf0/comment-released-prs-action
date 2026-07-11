@@ -28,7 +28,7 @@
         "@octokit/webhooks": "^14.2.0"
     },
     "devDependencies": {
-        "@types/node": "^24.13.2",
+        "@types/node": "^24.13.3",
         "@vercel/ncc": "^0.44.1",
         "tsx": "^4.23.0",
         "typescript": "^6.0.3"
