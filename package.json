@@ -31,7 +31,7 @@
         "@types/node": "^24.13.3",
         "@vercel/ncc": "^0.44.1",
         "tsx": "^4.23.0",
-        "typescript": "^6.0.3"
+        "typescript": "^7.0.2"
     },
     "allowScripts": {
         "esbuild@0.28.0": true
